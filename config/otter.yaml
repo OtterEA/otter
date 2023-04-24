@@ -1,0 +1,6 @@
+#################################### otter 自动部署工具配置文件  ################
+# 安装方式(online|offline)
+OTTER_INSTALL_METHOD: online
+
+# 是否启用混合架构部署(如果启用,离线下载时将会下载多架构镜像)
+OTTER_MIXED_ENABLED: false

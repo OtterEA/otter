@@ -1,0 +1,7 @@
+- name: System Optimization
+  include_tasks: Centos.yaml
+  when: ansible_distribution == "CentOS"
+
+- name: System Optimization
+  include_tasks: Ubuntu.yaml
+  when: ansible_distribution == "Ubuntu"

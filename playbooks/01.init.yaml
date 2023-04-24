@@ -1,0 +1,4 @@
+- hosts:
+  - kube_cluster
+  roles: 
+  - { role: prepare/init, tags: init }

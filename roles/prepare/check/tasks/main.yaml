@@ -1,2 +1,0 @@
-- name: test
-  shell: echo 1

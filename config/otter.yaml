@@ -4,3 +4,36 @@ OTTER_INSTALL_METHOD: online
 
 # 是否启用混合架构部署(如果启用,离线下载时将会下载多架构镜像)
 OTTER_MIXED_ENABLED: false
+
+# 是否国外部署(true|false),如果国内部署，在线安装自动切换成国内源，如果国外部署，在线安装切换成国外源
+OTTER_FOREIGN: false
+
+
+##################################  Docker 配置  #################################
+# Docker 版本
+DOCKER_VERSION: 
+
+# Docker 数据目录
+DOCKER_ROOT_DATA: /var/lib/docker
+
+# Docker driver版本(systemd|cgroupfs)
+DOCKER_DRIVER: systemd
+
+# docker网段设置(如有网络冲突，可自行修改,一般默认即可)
+DOCKER_BIP: 192.168.244.1/24
+
+################################ Containerd 配置 #################################
+
+
+################################ Harbor 配置  ####################################
+# 是否部署HARBOR，HARBOR部署方式为Chart部署
+HARBOR_ENABLE: true
+
+# HARBOR 部署节点IP，该IP必须要是K8S集群内
+HARBOR_IP: x.x.x.x
+
+# Harbor admin登陆密码
+HARBOR_PASSWORD: Otter007
+
+# Harbor 数据目录
+HARBOR_DATA_PATH: /data/harbor

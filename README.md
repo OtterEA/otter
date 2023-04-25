@@ -9,6 +9,9 @@
 5. CNI：flannel
 6. 配置文件支持高度自定义
 
+## 当前启动测试命令
+ansible-playbook playbooks/01.init.yaml -e "@./config/otter.yaml"
+
 ## 当前任务
 
 

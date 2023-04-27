@@ -5,6 +5,15 @@ OTTER_INSTALL_METHOD: online
 # 是否启用混合架构部署(如果启用,离线下载时将会下载多架构二进制命令与镜像)
 OTTER_MIXED_ENABLED: false
 
+##################################  Chronyd 时间同步设置 ###########################
+## 时间同步服务器IPS,如果有多个请填多个
+# eg: TIME_SERVER: ["localhost"] TIME_SERVER: ["localhost","127.0.0.1"]
+TIME_SERVER: ["localhost","127.0.0.1"]
+
+##################################  RunTime 配置 #################################
+# runtime 选择，目前只支持docker，未适配containerd
+RUN_TIME_TYPE: docker
+
 ##################################  Docker 配置  #################################
 # Docker版本,已验证版本: 20.10.24
 DOCKER_VERSION: 20.10.24

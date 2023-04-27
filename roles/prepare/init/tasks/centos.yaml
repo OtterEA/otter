@@ -28,13 +28,15 @@
 
 # 安装基础软件
 - name: Install Basic Software For System
-  shell: yum -y install {{ CENTOS7_SOFTWARE | join(" ") }} | cat
+  shell: yum -y install {{ ONLINE['CENTOS7_SOFTWARE'] }} | join(" ") }} | cat
   when: 
   - OTTER_INSTALL_METHOD|string == "online"
   - ansible_distribution_major_version|int == 7
 
 - name: Install Basic Software For System
-  shell: yum -y install {{ CENTOS8_SOFTWARE | join(" ") }} | cat
+  shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat
   when: 
   - OTTER_INSTALL_METHOD|string == "online"
   - ansible_distribution_major_version|int == 8
+
+## todo 离线包

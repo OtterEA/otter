@@ -1,0 +1,6 @@
+IP_CHECK:
+- 8.8.8.8
+
+DNS_CHECK:
+- mirrors.tuna.tsinghua.edu.cn
+- baidu.com

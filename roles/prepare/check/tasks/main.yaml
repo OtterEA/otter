@@ -1,2 +1,8 @@
 ## todo
 # 1. 检查配置文件合法性
+# 2. 检查docker二进制本地安装包是否存在，如果是多架构部署的，需要检查二个
+
+
+#- name: Check All Machine Architecture
+
+#- name: Check Docker Binary Package Exist

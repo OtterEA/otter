@@ -1,0 +1,13 @@
+- name: Unarchive Docker Binary Package
+  unarchive: src=files/bin/docker/{{ ansible_architecture }}/docker.tgz dest=/usr/bin/
+
+- name: Copy Docker Service Configuration
+  copy: src=docker.service dest=/usr/lib/systemd/system/docker.service force=yes
+
+- name: Create Docker Configuration Directory
+  file: path=/etc/docker state=directory recurse=yes mode=0755
+
+- name: Create Docker Configuration
+  template: src=daemon.json.j2 dest=/etc/docker/daemon.json force=yes
+
+# todo 离线部署时，需分发镜像到其他节点

@@ -12,30 +12,40 @@ TIME_SERVER: ["localhost","127.0.0.1"]
 
 ##################################  RunTime 配置 #################################
 # runtime 选择，目前只支持docker，未适配containerd
-RUN_TIME_TYPE: docker
+RUNTIME_TYPE: docker
 
 ##################################  Docker 配置  #################################
-# Docker版本,已验证版本: 20.10.24
+# Docker版本,已验证版本: 
 DOCKER_VERSION: 20.10.24
 
 # Docker 数据目录
 DOCKER_ROOT_DATA: /var/lib/docker
 
 # Docker driver版本(systemd|cgroupfs)
+# tips: Docker版本>=20.10才能使用systemd驱动
 DOCKER_DRIVER: systemd
 
 # docker网段设置(如有网络冲突，可自行修改,一般默认即可)
 DOCKER_BIP: 192.168.244.1/24
 
-################################ Containerd 配置 #################################
+#Docker INSECURITY配置，默认为Harbor域名
+DOCKER_INSECURITY: otter.harbor.com
+
+################################ Containerd 配置(暂时未适配) #################################
 
 
 ################################ Harbor 配置  ####################################
-# 是否部署HARBOR，HARBOR部署方式为Chart部署
+# 是否部署HARBOR，HARBOR部署方式为Chart部署,我们默认推荐部署
 HARBOR_ENABLE: true
 
+# Harbor 域名
+HARBOR_DOMAIN: otter.harbor.com
+
 # HARBOR 部署节点IP，该IP必须要是K8S集群内
-HARBOR_IP: x.x.x.x
+HARBOR_IP: 127.0.0.1
+
+# Harbor 访问Port
+HARBOR_PORT: 443
 
 # Harbor admin登陆密码
 HARBOR_PASSWORD: Otter007

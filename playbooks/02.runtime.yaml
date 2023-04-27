@@ -1,0 +1,6 @@
+- hosts:
+  - kube_cluster
+  ignore_unreachable: false
+  roles: 
+  - { role: docker, tags: docker, when: RUNTIME_TYPE|string == "docker" }
+  - { role: containerd, tags: containerd, when: RUNTIME_TYPE|string == "containerd" }

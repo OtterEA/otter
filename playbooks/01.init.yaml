@@ -2,5 +2,5 @@
   - kube_cluster
   ignore_unreachable: false
   roles: 
-  #- { role: prepare/init, tags: init }
-  - { role: prepare/ping, tags: ping }
+  - { role: prepare/init, tags: init }
+  #- { role: prepare/ping, tags: ping }

@@ -1,0 +1,14 @@
+{
+  "registry-mirrors": ["https://bxsfpjcb.mirror.aliyuncs.com"],
+  "exec-opts": ["native.cgroupdriver={{ DOCKER_CGROUP_TYPE }}"],
+  "max-concurrent-downloads": 10,
+  "bip": "{{ DOCKER_BIP }}",
+  "log-driver": "json-file",
+  "log-level": "warn",
+  "log-opts": {
+    "max-size": "100m",
+    "max-file": "1"
+  },
+  "insecure-registries": ["{{ HARBOR_IP }}:{{ HARBOR_PORT }}"],
+  "data-root":"{{ DOCKER_ROOT_DATA }}"
+}

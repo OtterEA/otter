@@ -1,14 +1,23 @@
 {
-  "registry-mirrors": ["https://bxsfpjcb.mirror.aliyuncs.com"],
+  "data-root": "{{ DOCKER_ROOT_DATA }}",
   "exec-opts": ["native.cgroupdriver={{ DOCKER_CGROUP_TYPE }}"],
+  "registry-mirrors": ["https://bxsfpjcb.mirror.aliyuncs.com"],
   "max-concurrent-downloads": 10,
+  "max-concurrent-downloads": 3,
+  "max-concurrent-uploads": 5,
+  "max-download-attempts": 5,
+  "experimental": true,
   "bip": "{{ DOCKER_BIP }}",
   "log-driver": "json-file",
   "log-level": "warn",
   "log-opts": {
-    "max-size": "100m",
-    "max-file": "1"
+    "max-size": "50m",
+    "max-file": "3"
   },
-  "insecure-registries": ["{{ HARBOR_IP }}:{{ HARBOR_PORT }}"],
-  "data-root":"{{ DOCKER_ROOT_DATA }}"
+{% if DOCKER_REMOTE_API_ENABLE %}
+  "hosts": ["tcp://0.0.0.0:2376", "unix:///var/run/docker.sock"],
+{% endif %}
+{% if HARBOR_ENABLE %}
+  "insecure-registries": ["{{ HARBOR_IP }}:{{ HARBOR_PORT }}","{{ HARBOR_DOMAIN }}"]
+{% endif %}
 }

@@ -1,13 +1,62 @@
-- name: Unarchive Docker Binary Package
-  unarchive: src=files/bin/docker/{{ ansible_architecture }}/docker.tgz dest=/usr/bin/
+# check docker install package exist
+- block:
+  - name: Check Docker Binary Package Exist for Multi-architecture
+    stat: path={{ item }}
+    register: docker_file_state
+    with_items:
+    - "{{ playbook_dir | dirname }}/files/bin/docker/x86_64/docker-{{ DOCKER_VERSION }}.tgz"
+    - "{{ playbook_dir | dirname }}/files/bin/docker/aarch64/docker-{{ DOCKER_VERSION }}.tgz"
+  
+  - name: Docker Binary Package Not Exist
+    fail: msg="Docker Binary Package Not Exist"
+    when: false in ( docker_file_state.results | map(attribute='stat.exists') | list )
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == true
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+# check result
+#"msg": [
+#    true, 
+#    false
+#]
 
-- name: Copy Docker Service Configuration
-  copy: src=docker.service dest=/usr/lib/systemd/system/docker.service force=yes
+# check docker install package exist
+- block:
+  - name: Check Docker Binary Package Exist
+    stat: path={{ playbook_dir | dirname }}/files/bin/docker/{{ ansible_architecture }}/docker-{{ DOCKER_VERSION }}.tgz
+    register: docker_file_state
+  
+  - name: Docker Binary Package Not Exist
+    fail: msg="Docker Binary Package Not Exist"
+    when: docker_file_state.stat.exists == false
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == false
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
 
-- name: Create Docker Configuration Directory
-  file: path=/etc/docker state=directory recurse=yes mode=0755
 
-- name: Create Docker Configuration
-  template: src=daemon.json.j2 dest=/etc/docker/daemon.json force=yes
+# x86 install link https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-20.10.24.tgz
 
-# todo 离线部署时，需分发镜像到其他节点
+# install docker
+- block:
+  - name: Unarchive Docker Binary Package
+    unarchive: src={{ playbook_dir | dirname }}/files/bin/docker/{{ ansible_architecture }}/docker-{{ DOCKER_VERSION }}.tgz dest=/tmp/otter/ 
+  
+  - name: Get All Files of /tmp/otter
+    find: paths=/tmp/otter/docker file_type=file 
+    register: docker_binary_files
+  
+  - name: Copy Docker Binary Files to /usr/bin/
+    copy: src={{ item.path }} dest=/usr/bin/{{ item.path | basename }} remote_src=yes mode=0755 force=yes
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ docker_binary_files.files }}"
+
+  - name: Copy Docker Service Configuration
+    copy: src=docker.service dest=/usr/lib/systemd/system/docker.service force=yes
+
+  - name: Create Docker Configuration Directory
+    file: path=/etc/docker state=directory recurse=yes mode=0755
+
+  - name: Create Docker Configuration
+    template: src=daemon.json.j2 dest=/etc/docker/daemon.json force=yes
+
+## todo 离线部署时，需分发镜像到其他节点

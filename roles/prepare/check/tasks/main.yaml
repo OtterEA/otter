@@ -1,6 +1,6 @@
 ## todo
-# 1. 检查配置文件合法性
-# 2. 检查docker二进制本地安装包是否存在，如果是多架构部署的，需要检查二个
+# 1. 检查配置文件合法性 auth: jiayu997
+# 2. 检查docker二进制本地安装包是否存在，如果是多架构部署的，需要检查二个 author: jiayu997
 
 
 #- name: Check All Machine Architecture

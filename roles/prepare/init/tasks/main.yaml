@@ -1,3 +1,5 @@
+## todo 为每个节点创建离线资源包文件夹
+
 - name: System Optimization for ALL System
   include_tasks: common.yaml
 

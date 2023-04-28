@@ -1,4 +1,7 @@
 ---
+- name: Create Temp Directory for otter
+  file: path=/tmp/otter state=directory mode=0755 recurse=yes 
+
 - name: Turn Off Swap
   shell: swapoff -a
 

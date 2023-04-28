@@ -1,8 +1,9 @@
 #################################### otter 自动部署工具配置文件  ################
 # 安装方式(online|offline)
-OTTER_INSTALL_METHOD: online
+OTTER_INSTALL_METHO: online
 
 # 是否启用混合架构部署(如果启用,离线下载时将会下载多架构二进制命令与镜像)
+# 如果集群内有多架构请设置为true，否则会导致节点无法获取离线资源包
 OTTER_MIXED_ENABLED: false
 
 ##################################  Chronyd 时间同步设置 ###########################
@@ -31,6 +32,9 @@ DOCKER_BIP: 192.168.244.1/24
 #Docker INSECURITY配置，默认为Harbor域名
 DOCKER_INSECURITY: otter.harbor.com
 
+# Docker Remote API是否开启
+DOCKER_REMOTE_API_ENABLE: false
+
 ################################ Containerd 配置(暂时未适配) #################################
 
 
@@ -38,7 +42,7 @@ DOCKER_INSECURITY: otter.harbor.com
 # 是否部署HARBOR，HARBOR部署方式为Chart部署,我们默认推荐部署
 HARBOR_ENABLE: true
 
-# Harbor 域名
+# Harbor 域名,如果没有域名需求默认即可
 HARBOR_DOMAIN: otter.harbor.com
 
 # HARBOR 部署节点IP，该IP必须要是K8S集群内

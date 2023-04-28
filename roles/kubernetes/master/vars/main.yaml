@@ -1,0 +1,2 @@
+# k8s 集群内部通信域名(主要用于node节点与API Server的6443端口通信),部署时一般默认即可
+KUBERNETES_DOMAIN: otter.apiserver.com

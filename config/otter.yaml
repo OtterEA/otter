@@ -35,7 +35,37 @@ DOCKER_INSECURITY: otter.harbor.com
 # Docker Remote API是否开启
 DOCKER_REMOTE_API_ENABLE: false
 
-################################ Containerd 配置(暂时未适配) #################################
+################################ Containerd 配置(暂时未适配) #######################
+
+
+################################ K8S 配置   #######################################
+# k8s 版本
+KUBERNETES_VERSION: 1.20.8
+
+# pod网段设置(如有网络冲突，可自行修改,一般默认即可) 
+POD_NETWORK_CIDR: 10.244.0.0/16
+
+# service 网段(如有网络冲突，可自行修改，一般默认即可)
+SERVICE_CIDR: 10.96.0.0/12
+
+# k8s网络模式(默认启用ipvs,当缺少ipvs模块时，启动切换iptables)
+KUBERNETES_NETWORK_MODEL: ipvs
+
+# k8s cni插件类型(flannel|calico|),暂时只支持flannel
+KUBERNETES_CNI_TYPE: flannel
+
+# k8s etcd数据目录(如有单独磁盘供etcd使用，可修改该路径-在安装前修改)
+KUBERNETES_ETCD_DATA_DIR: /var/lib/etcd
+
+# k8s deschduler组件是否部署
+KUBERNETES_DESCHDULER_ENABLE: false
+
+# k8s VIP，当K8S高可用时,node节点将基于lvscare，使用这个VIP与APIserver通信
+# 当节点数<=3时，可不用填
+KUBERNETES_VIP: 127.0.0.1
+
+# k8s init token(设置默认的bootstrap token)
+KUBERNETES_BOOTSTRAP_TOKEN: xxb12jk1234debxkfcbxae9d876641c8
 
 
 ################################ Harbor 配置  ####################################

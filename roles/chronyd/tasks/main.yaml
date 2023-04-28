@@ -1,0 +1,29 @@
+- name: Check Chronyd Service Installation
+  shell: systemctl status chronyd || echo "NoFound"
+  register: chronyd_exist
+
+# system has already install chronyd
+- name: Install Chronyd Service
+  copy: src={{ playbook_dir | dirname }}/files/bin/chronyd/{{ ansible_architecture }}/chronyd dest=/usr/sbin/chronyd mode=0755
+  when: "'NoFound' in chronyd_exist.stdout"
+
+# Start chronyd Service
+- block:
+  - name: Copy Chronyd Server Configuration file
+    template: src=chronyd-server.conf.j2 dest=/etc/chrony.conf backup=no force=yes
+    when: inventory_hostname in TIME_SERVER
+  
+  - name: Copy Chronyd Client Configuration file
+    template: src=chronyd-client.conf.j2 dest=/etc/chrony.conf backup=no force=yes
+    when: inventory_hostname not in TIME_SERVER
+  
+  - name: Start Chronyd Service
+    systemd: name=chronyd state=restarted enabled=yes daemon_reload=yes
+  any_errors_fatal: true
+
+- name: Disable other time Service
+  systemd: name={{ item }} state=stopped enabled=no masked=yes
+  with_items:
+  - "ntpd"
+  - "systemd-timesyncd"
+  ignore_errors: yes

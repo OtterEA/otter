@@ -37,6 +37,13 @@
 
 # install docker
 - block:
+  - name: Insert Harbor Domain
+    lineinfile:
+      path: /etc/hosts
+      line: '{{ HARBOR_IP }} {{ HARBOR_DOMAIN }}'
+      state: present
+    when: HARBOR_ENABLE|default(true)|bool == true
+
   - name: Unarchive Docker Binary Package
     unarchive: src={{ playbook_dir | dirname }}/files/bin/docker/{{ ansible_architecture }}/docker-{{ DOCKER_VERSION }}.tgz dest=/tmp/otter/ 
   
@@ -58,5 +65,10 @@
 
   - name: Create Docker Configuration
     template: src=daemon.json.j2 dest=/etc/docker/daemon.json force=yes
-
-## todo 离线部署时，需分发镜像到其他节点
+  
+  - name: Wait for Docker Run
+    shell: systemctl is-active docker.service
+    register: docker_status
+    until: '"active" in docker_status.stdout'
+    retries: 5
+    delay: 5

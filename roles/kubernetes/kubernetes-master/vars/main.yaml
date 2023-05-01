@@ -1,0 +1,8 @@
+## docker版本>=20.10才支持systemd
+# 20.10.14 -> 20.10
+DOCKER_CGROUP_TYPE: >-
+  {%- if DOCKER_VERSION.split('.')[0:2]|join('.')|float >= 20.10 and DOCKER_DRIVER|string == "systemd" -%}
+    systemd
+  {%- else -%}
+    cgroupfs
+  {%- endif -%}

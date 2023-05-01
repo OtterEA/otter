@@ -1,0 +1,49 @@
+{% if kubernetes_tmp_network_model == "ipvs" %}
+{% if groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 1 %}
+#!/bin/bash
+# ipvs 单master加入集群脚本
+if ! grep "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" /etc/hosts ; then
+	echo "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" >> /etc/hosts
+fi
+
+# 节点加入集群
+cat > /tmp/otter/kubeadm-new-node <<EOF
+{{ lookup('template','kubeadm-new-node.j2') }}
+EOF
+kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# 生成bootstrap-kubelet.conf配置文件
+cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF
+{{ lookup('template','bootstrap-kubelet.conf.j2') }}
+EOF
+
+{% elif groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+#!/bin/bash
+# ipvs 多master节点node节点加入集群脚本
+{% endif %}
+
+{% elif kubernetes_tmp_network_model == "iptables" %}
+{% if groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 1 %}
+#!/bin/bash
+# iptables node节点加入集群脚本
+if ! grep "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" /etc/hosts ; then
+    echo "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" >> /etc/hosts
+fi
+
+# 节点加入集群
+cat > /tmp/otter/kubeadm-new-node <<EOF
+{{ lookup('template','kubeadm-new-node.j2') }}
+EOF
+kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# 生成bootstrap-kubelet.conf文件
+cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF
+{{ lookup('template','bootstrap-kubelet.conf.j2') }}
+EOF
+
+{% elif groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+#!/bin/bash
+# iptables 多master节点加入集群脚本
+{% endif %}
+
+{% endif %}

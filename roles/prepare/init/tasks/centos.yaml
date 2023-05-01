@@ -14,29 +14,63 @@
   systemd: name=NetworkManager state=stopped enabled=no
   when: ansible_distribution_major_version|int == 7
 
-# 配置Yum源
-- name: Distribute Yum Repo Configuration
-  copy: src={{ item }} dest=/etc/yum.repos.d/{{ item }} force=yes
-  with_items:
-  - yum/centos7/Centos7-epel.repo
-  - yum/centos7/Centos7.repo
-  when: ansible_distribution_major_version|int == 7
+# 备份原yum文件
+- block:
+  - name: Get All Yum Repo Files
+    find: paths=/etc/yum.repos.d file_type=file 
+    register: yum_repo_files
+  
+  - name: Create Yum Repo Backup Directory
+    file: path=/etc/yum.repos.d/yum-backup state=directory mode=0755
+  
+  - name: Copy Yum Repo Files to /etc/yum.repos.d
+    copy: src={{ item.path }} dest=/etc/yum.repos.d/yum-backup/{{ item.path | basename }} remote_src=yes mode=0755
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ yum_repo_files.files }}"
 
-- name: Distribute Yum Repo Configuration
-  copy: src=yum/centos8/Centos8.repo dest=/etc/yum.repos.d/Centos8.repo force=yes
-  when: ansible_distribution_major_version|int == 8
+  - name: Delete Yum Repo Files
+    file: path={{ item.path }} state=absent
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ yum_repo_files.files }}"
+
+
+# 配置Yum源
+- block:
+  - name: Distribute Yum Repo Configuration
+    copy: src={{ item }} dest=/etc/yum.repos.d/{{ item.split('/') | last }}
+    loop_control:
+      label: "{{ item.split('/') | last }}"
+    with_items:
+    - yum/centos7/otter-centos7-epel.repo
+    - yum/centos7/otter-centos7.repo
+    when: ansible_distribution_major_version|int == 7
+  
+  - name: Distribute Yum Repo Configuration
+    copy: src={{ item }} dest=/etc/yum.repos.d/{{ item.split('/') | last }}
+    loop_control:
+      label: "{{ item.split('/') | last }}"
+    with_items:
+    - yum/centos8/otter-centos8-epel-modular.repo
+    - yum/centos8/otter-centos8-epel-testing-modular.repo
+    - yum/centos8/otter-centos8-epel-testing.repo
+    - yum/centos8/otter-centos8-epel.repo
+    - yum/centos8/otter-centos8.repo
+    when: ansible_distribution_major_version|int == 8
 
 # 安装基础软件
-- name: Install Basic Software For System
-  shell: yum -y install {{ ONLINE['CENTOS7_SOFTWARE'] }} | join(" ") }} | cat
-  when: 
-  - OTTER_INSTALL_METHOD|string == "online"
-  - ansible_distribution_major_version|int == 7
-
-- name: Install Basic Software For System
-  shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat
-  when: 
-  - OTTER_INSTALL_METHOD|string == "online"
-  - ansible_distribution_major_version|int == 8
+- block:
+  - name: Install Basic Software For System
+    shell: yum -y install {{ ONLINE['CENTOS7_SOFTWARE'] }} | join(" ") }} | cat
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_major_version|int == 7
+  
+  - name: Install Basic Software For System
+    shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_major_version|int == 8
 
 ## todo 离线包

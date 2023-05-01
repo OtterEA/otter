@@ -1,0 +1,21 @@
+- name: Kubernetes Environment Reset
+  shell: kubeadm reset -f &>/dev/null | cat
+
+# todo : 补充全要删除的文件
+- name: Delete Kubernetes Files
+  file: path={{ item }} state=absent 
+  with_items:
+  - /etc/kubernetes
+  - /var/lib/cni
+  - /var/lib/kubelet
+  - /etc/cni
+  - ~/.kube
+  - /etc/kubernetes/pki
+  - /etc/kubernetes/bootstrap-kubelet.conf
+
+- name: Delete Kubernetes Network Interface
+  shell: |
+    ip link set {{ item }} down &>/dev/null | cat
+    ip link delete {{ item }} &>/dev/null | cat
+  when: item in ["cni0","flannel.1","kube-ipvs0","dummy0"] or item|regex_search("^veth.*",multiline=True,ignorecase=True)
+  with_items: "{{ ansible_facts['interfaces'] }}"

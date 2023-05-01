@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    certificate-authority: /etc/kubernetes/pki/ca.crt
+{% if (kubernetes_tmp_network_model == "ipvs") or (kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 1) %}
+    server: https://apiserver.cluster.local:6443
+{% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+    server: https://apiserver.cluster.local:16443
+{% endif %}
+  name: bootstrap
+contexts:
+- context:
+    cluster: bootstrap
+    user: kubelet-bootstrap
+  name: bootstrap
+current-context: bootstrap
+preferences: {}
+users:
+- name: kubelet-bootstrap
+  user:
+    token: {{ KUBERNETES_BOOTSTRAP_TOKEN }}

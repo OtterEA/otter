@@ -1,0 +1,75 @@
+## K8S iptables 模式模式初始化
+- block:
+  - name: Init Kubernetes Cluster With IPTABLES
+    set_fact:
+      kubernetes_tmp_network_model: "iptables"
+  when: 
+  - KUBERNETES_NETWORK_MODEL|string == "iptables"
+
+# decide k8s cluster network type
+- block: 
+  - name: ModeProbe IPVS Kernel Model(Kernel >= 4.19)
+    modprobe: name={{ item }} state=present
+    with_items:
+    - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - nf_conntrack
+    register: modprobe_result
+    ignore_errors: true
+
+  - name: IPVS Kernel Model Lack
+    set_fact:
+      kubernetes_tmp_network_model: "iptables"
+    when: 
+    - modprobe_result.failed is defined
+    - modprobe_result.failed|bool == true
+
+  - name: Init Kubernetes Cluster With IPVS
+    set_fact:
+      kubernetes_tmp_network_model: "ipvs"
+    when: 
+    - modprobe_result.failed is not defined
+  when: 
+  - ansible_kernel.split('.')[0:2]|join('.') | float >= 4.19
+  - KUBERNETES_NETWORK_MODEL|string == "ipvs"
+
+# decide k8s cluster network type
+- block: 
+  - name: ModeProbe IPVS Kernel Model(Kernel < 4.19)
+    modprobe: name={{ item }} state=present
+    with_items:
+    - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - nf_conntrack_ipv4
+    register: modprobe_result
+    ignore_errors: true
+
+  - name: IPVS Kernel Model Lack
+    set_fact:
+      kubernetes_tmp_network_model: "iptables"
+    when: 
+    - modprobe_result.failed is defined
+    - modprobe_result.failed|bool == true
+
+  - name: Init Kubernetes Cluster With IPVS
+    set_fact:
+      kubernetes_tmp_network_model: "ipvs"
+    when: 
+    - modprobe_result.failed is not defined
+  when: 
+  - ansible_kernel.split('.')[0:2]|join('.') | float < 4.19
+  - KUBERNETES_NETWORK_MODEL|string == "ipvs"
+
+### todo iptables 模式下的多master高可用待适配
+- name: iptables is not adapted
+  fail: msg="iptables is not adapted(master num >= 3)"
+  any_errors_fatal: true
+  when:
+  - kubernetes_tmp_network_model == "iptables"
+  - groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length >= 3

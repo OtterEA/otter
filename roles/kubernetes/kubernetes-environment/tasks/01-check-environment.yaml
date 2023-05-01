@@ -1,0 +1,30 @@
+# check kubernetes install package exist
+- block:
+  - name: Check Kubernetes Binary Package Exist for Multi-architecture
+    stat: path={{ item }}
+    register: kubernetes_file_state
+    with_items:
+    - "{{ playbook_dir | dirname }}/files/bin/k8s/x86_64/kubernetes-v{{ KUBERNETES_VERSION }}.tgz"
+    - "{{ playbook_dir | dirname }}/files/bin/k8s/aarch64/kubernetes-v{{ KUBERNETES_VERSION }}.tgz"
+  
+  - name: Kubernetes Binary Package Not Exist
+    fail: msg="Kubernetes Binary Package Not Exist"
+    when: false in ( kubernetes_file_state.results | map(attribute='stat.exists') | list )
+    any_errors_fatal: true
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == true
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+
+# check kubernetes install package exist
+- block:
+  - name: Check Kubernetes Binary Package Exist
+    stat: path={{ playbook_dir | dirname }}/files/bin/k8s/{{ ansible_architecture }}/kubernetes-v{{ KUBERNETES_VERSION }}.tgz
+    register: kubernetes_file_state
+  
+  - name: Kubernetes Binary Package Not Exist
+    fail: msg="Kubernetes Binary Package Not Exist"
+    when: kubernetes_file_state.stat.exists == false
+    any_errors_fatal: true
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == false
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block

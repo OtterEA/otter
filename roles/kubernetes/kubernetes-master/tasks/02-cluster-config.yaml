@@ -1,0 +1,149 @@
+#### 生成kubeadm配置文件
+- name: Create Kubeadm Init Configuration file
+  template: src=kubeadm-new-cluster.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-cluster force=yes
+
+#- name: Create Bootstrap Kubelet Configuration
+#  template: src=bootstrap-kubelet.conf.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/bootstrap-kubelet.conf force=yes
+- name: test
+  shell: exit 1
+
+#### K8S 集群初始化
+- block: 
+  - name: Init Kubernetes Cluster
+    shell: kubeadm init --config {{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-cluster --upload-certs -v 0
+    register: kubernetes_init_result
+  
+  - name: Init Kubernetes Failed
+    fail: msg="Init Kubernetes Failed"
+    any_errors_fatal: true
+    when: kubernetes_init_result.rc != 0
+
+  - name: Copy /etc/kubernetes/admin.conf to ~/.kube/config
+    copy: src=/etc/kubernetes/admin.conf dest=~/.kube/config force=yes remote_src=yes mode=0700
+  
+  - name: Copy Bootstrap Kubelet Configuration
+    template: src=bootstrap-kubelet.conf.j2 dest=/etc/kubernetes/bootstrap-kubelet.conf mode=0755 force=yes
+
+- name: Wait Kubernetes Ready
+  shell: while :; do if kubectl get pods -n kube-system | grep -E "(etcd|kube)" | grep "0/1"; then sleep 15 ; else break ; fi; done
+
+- name: Set Master node can be scheduled
+  shell: kubectl taint nodes --all node-role.kubernetes.io/master- | cat
+  when: KUBERNETES_SCHEDULE_ENABLE == true
+
+###################### 初始化网络插件 #############################################
+# todo 待适配calico和cilium
+- block:
+  - name: Deploy Flannel Network Plugin
+    include_role:
+      name: cni/flannel
+      apply:
+        tags: always
+    when: KUBERNETES_CNI_TYPE|string == "flannel"
+  
+  - name: Deploy Calico Network Plugin
+    include_role:
+      name: cni/calico
+      apply:
+        tags: always
+    when: KUBERNETES_CNI_TYPE|string == "calico"
+  
+  - name: Deploy Cilium Network Plugin
+    include_role:
+      name: cni/cilium
+      apply:
+        tags: always
+    when: KUBERNETES_CNI_TYPE|string == "cilium"
+
+##################### coredns 配置与优化 ########################################
+# nameserver 禁止配置成coredns svc ip，容易导致回环问题
+- block:
+  - name: Check Node Local DNS Configuration
+    shell: cat /etc/resolv.conf | grep nameserver &>/dev/null
+    ignore_errors: yes
+    register: nameserver_result
+  
+  - name: Dsistribute DNS Configuration
+    template: src=resolv.conf.j2 dest=/etc/resolv.conf backup=yes mode=0644
+    when: nameserver_result.rc != 0
+  
+  - name: Delete System DNS Match
+    shell: sed -ri "/^search(.*)$/d" /etc/resolv.conf &>/dev/null
+  
+  - name: Modify Coredns ConfigMap Configuration
+    shell:
+      cmd: |
+        cat << EOF | kubectl apply -f -
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: coredns
+          namespace: kube-system
+        data:
+          Corefile: |
+            .:53 {
+                errors
+                health {
+                   lameduck 5s
+                }
+                ready
+                kubernetes cluster.local in-addr.arpa ip6.arpa {
+                   pods verified
+                   fallthrough in-addr.arpa ip6.arpa
+                   ttl 30
+                }
+                rewrite stop type AAAA A
+                autopath @kubernetes
+                prometheus :9153
+                forward . /etc/resolv.conf {
+                   max_concurrent 1000
+                }
+                cache 30
+                loop
+                reload
+                loadbalance
+            }
+        EOF
+
+  - name: Modify Coredns Resource Configuration
+    shell: kubectl patch deployment/coredns -n kube-system -p '{"spec":{"template":{"spec":{"containers":[{"name":"coredns","resources":{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"100m","memory":"100Mi"}}}]}}}}'
+
+# todo: Prometheus 适配HTTPS抓取
+# 移除kube-apiserver的--insecure-port=0
+# 移除kube-controller-manager的--port=0
+# 移除kube-schduler的--port=
+#- name: 打开K8S组件Metric端口
+#  shell: "sed -i '/--port=0/d' /etc/kubernetes/manifests/kube-controller-manager.yaml && \
+#  sed -i '/--port=0/d' /etc/kubernetes/manifests/kube-scheduler.yaml && \
+#  sed -i '/--insecure-port=0/d' /etc/kubernetes/manifests/kube-apiserver.yaml"
+#  sed -ri 's@listen-metrics-urls=.*@listen-metrics-urls=http://0.0.0.0:2381@g' /etc/kubernetes/manifests/etcd.yaml
+
+################### 部署Helm3 ###################################
+- name: Deploy Helm
+  include_role:
+    name: helm
+    apply:
+      tags: always
+
+################### 部署K9S #####################################
+- name: Deploy K9S
+  include_role:
+    name: k9s
+    apply:
+      tags: always
+
+##################### 部署Metrics Server组件 ####################
+- name: Deploy Metrics Server
+  include_role:
+    name: metrics-server
+    apply:
+      tags: always
+  when: KUBERNETES_METRICS_SERVER_ENABLE == true
+
+#################### 部署Kubernetes DashBoard ##################
+- name: Deploy Kubernetes Dashboard
+  include_role:
+    name: metrics-server
+    apply:
+      tags: always
+  when: KUBERNETES_DASHBOARD_ENABLE == true

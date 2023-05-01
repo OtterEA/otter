@@ -1,0 +1,30 @@
+############################## 节点环境初始化 ############################
+- name: Init Environment for Kubernetes
+  include_role:
+    name: kubernetes/kubernetes-environment
+    apply: 
+      tags: always
+
+##################### 网络模式设置 #######################################
+- name: Kubernetes Network Type Set
+  include_tasks: 01-network-mode-decide.yaml
+
+################## 集群初始化配置 ########################################
+- name: Kubernetes Cluster Configuration
+  include_tasks: 02-cluster-config.yaml
+
+################# bootstrap 配置#########################################
+- name: Kubernetes Bootstrap Configuration
+  include_tasks: 03-bootstrap.yaml
+
+############### 生成节点加入集群脚本 ########################################
+- name: Generate Kubernetes Join Cluster Script
+  include_tasks: 04-node-join.yaml
+
+
+#- name: Generate Kubernetes Join Cluster Script
+#  include_tasks: 
+#    name: 04-node-join.yaml
+#    apply:
+#      tags: always
+#  tags: k8s-node-join-config

@@ -1,0 +1,5 @@
+- hosts:
+  - kubernetes_master
+  ignore_unreachable: false
+  roles: 
+  - { role: kubernetes/kubernetes-master, tags: kubernetes-master }

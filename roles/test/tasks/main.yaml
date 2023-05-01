@@ -1,0 +1,6 @@
+- name: debug
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+  register: rest
+
+- name: debug-1
+  debug: msg={{ rest.stdout }}

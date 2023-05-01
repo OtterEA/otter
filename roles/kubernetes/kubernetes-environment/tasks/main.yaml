@@ -1,0 +1,31 @@
+- name: Check Kubernetes Package Exist
+  include_tasks: 
+    file: 01-check-environment.yaml
+    apply:
+      tags: always
+  tags: k8s-check-environment
+  when: inventory_hostname == ansible_env['SSH_CLIENT'].split() | first
+
+- name: Clean for Kubernetes
+  include_tasks: 
+    file: 02-clean-environment.yaml
+    apply:
+      tags: always
+  tags: k8s-clean-environment
+
+- name: Init Environment for Kubernetes
+  include_tasks: 
+    file: 03-init-environment.yaml
+    apply:
+      tags: always
+  tags: k8s-init-environment
+
+- name: Kubernetes Image Deal
+  include_tasks: 
+    file: 04-image-deal.yaml
+    apply:
+      tags: always
+  tags: k8s-image-deal
+  when: HARBOR_ENABLE == true
+
+

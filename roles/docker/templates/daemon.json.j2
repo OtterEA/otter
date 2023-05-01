@@ -8,16 +8,16 @@
   "max-download-attempts": 5,
   "experimental": true,
   "bip": "{{ DOCKER_BIP }}",
+{% if DOCKER_REMOTE_API_ENABLE %}
+  "hosts": ["tcp://0.0.0.0:2376", "unix:///var/run/docker.sock"],
+{% endif %}
+{% if HARBOR_ENABLE %}
+  "insecure-registries": ["{{ HARBOR_IP }}:443","{{ HARBOR_DOMAIN }}"],
+{% endif %}
   "log-driver": "json-file",
   "log-level": "warn",
   "log-opts": {
     "max-size": "50m",
     "max-file": "3"
-  },
-{% if DOCKER_REMOTE_API_ENABLE %}
-  "hosts": ["tcp://0.0.0.0:2376", "unix:///var/run/docker.sock"],
-{% endif %}
-{% if HARBOR_ENABLE %}
-  "insecure-registries": ["{{ HARBOR_IP }}:{{ HARBOR_PORT }}","{{ HARBOR_DOMAIN }}"]
-{% endif %}
+  }
 }

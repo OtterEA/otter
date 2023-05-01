@@ -40,14 +40,16 @@ KERNEL_PARAMETER:
 - { name: 'net.ipv4.ip_forward' , value: '1' , comment: '' }
 #- { name: 'kernel.core_pattern' , value: 'core' , comment: '避免发生故障时没有 coredump' }  部分国产环境下会产生大量core文件，不配置该设置
 
-############ 系统需要安装的基础软件 ###########
+############ 系统需要安装的基础软件说明(非必要软件,请不要安装) ###########
+# bash-completion 自动补全软件 fix: kubectl & helm3 completion
+# socat & conntrack-tools fix: conntrack not found in system path
 ONLINE:
   CENTOS7_SOFTWARE:
   - bash-completion
-  - vim
-  - net-tools
+  - socat 
+  - conntrack-tools
   CENTOS8_SOFTWARE:
   - bash-completion
-  - vim
-  - net-tools
+  - socat 
+  - conntrack-tools
 OFFLINE:

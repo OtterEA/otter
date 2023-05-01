@@ -1,0 +1,188 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+bootstrapTokens:
+- token: {{ KUBERNETES_BOOTSTRAP_TOKEN }}
+  description: "kubeadm bootstrap token"
+  ttl: "0" # 0=永久生效
+  usages:
+  - authentication
+  - signing
+  groups:
+  - system:bootstrappers:kubeadm:default-node-token
+localAPIEndpoint:
+  advertiseAddress: {{ groups["kubernetes_master"][0] }}
+  bindPort: 6443
+certificateKey: {{ KUBERNETES_CERTIFICATE_KEY }}
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: {{ KUBERNETES_VERSION }}
+{% if (kubernetes_tmp_network_model == "ipvs") or (kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 1) %}
+controlPlaneEndpoint: apiserver.cluster.local:6443
+{% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+controlPlaneEndpoint: apiserver.cluster.local:16443
+{% endif %}
+{# 设置镜像坐标 #}
+{% if ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == false %}
+imageRepository: {{ KUBERNETES_IMAGE_REPO }}
+{% elif ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == true %}
+imageRepository: {{ HARBOR_DOMAIN }}/k8s
+{% endif %}
+certificatesDir: "/etc/kubernetes/pki"
+networking:
+  dnsDomain: cluster.local
+  podSubnet: {{ POD_NETWORK_CIDR }}
+  serviceSubnet: {{ SERVICE_CIDR }}
+apiServer:
+  certSANs:
+  - 127.0.0.1
+  - apiserver.cluster.local
+{# 设置高可用时VIP签发证书 #}
+{%  if groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+{%  for ip in groups["kubernetes_master"] + groups["kubernetes_master_control_plane"] %}
+  - {{ ip }}
+{%  endfor %}
+  - {{ KUBERNETES_VIP }}
+{%  endif %}
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+    enable-aggregator-routing: "true"
+    token-auth-file: /etc/kubernetes/pki/token.csv
+  extraVolumes:
+  - name: localtime
+    hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    readOnly: true
+    pathType: File
+  timeoutForControlPlane: 4m0s
+controllerManager:
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,RotateKubeletServerCertificate=true,EphemeralContainers=true
+    experimental-cluster-signing-duration: 876000h0m0s
+    pod-eviction-timeout: 5m0s
+    terminated-pod-gc-threshold: "10"
+  extraVolumes:
+  - hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    name: localtime
+    readOnly: true
+    pathType: File
+scheduler:
+  extraArgs:
+    feature-gates: TTLAfterFinished=true,EphemeralContainers=true
+  extraVolumes:
+  - hostPath: /etc/localtime
+    mountPath: /etc/localtime
+    name: localtime
+    readOnly: true
+    pathType: File
+etcd:
+  local:
+    #imageRepository: k8s
+    #imageTag: v1
+    dataDir: {{ KUBERNETES_ETCD_DATA_DIR }}
+    extraArgs:
+      listen-metrics-urls: http://0.0.0.0:2381
+      heartbeat-interval: "500"
+      election-timeout: "5000"
+dns:
+  type: CoreDNS
+  # 可能版本问题，官网显示支持，实际不支持
+  #ImageMeta:
+  #  imageRepository: 
+  #  imageTag:
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+address: 0.0.0.0
+healthzPort: 10248
+healthzBindAddress: 0.0.0.0
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    cacheTTL:  2m0s
+    enabled: true
+  x509:
+    clientCAFile: /etc/kubernetes/pki/ca.crt
+authorization:
+  mode: Webhook
+  webhook:
+    cacheAuthorizedTTL: 5m0s
+    cacheUnauthorizedTTL: 30s
+clusterDomain: cluster.local
+rotateCertificates: true
+cgroupDriver: {{ DOCKER_CGROUP_TYPE }}
+httpCheckFrequency: 20s
+syncFrequency: 1m0s
+runtimeRequestTimeout: 2m0s
+fileCheckFrequency: 20s
+volumeStatsAggPeriod: 1m0s
+shutdownGracePeriod: 0s
+nodeStatusReportFrequency: 5m0s
+nodeStatusUpdateFrequency: 10s
+shutdownGracePeriodCriticalPods: 0s
+streamingConnectionIdleTimeout: 4h
+evictionPressureTransitionPeriod: 5m0s
+eventBurst: 10
+eventRecordQPS: 5
+staticPodPath: /etc/kubernetes/manifests
+protectKernelDefaults: false
+cgroupsPerQOS: true
+containerLogMaxSize: "10Mi"
+containerLogMaxFiles: 5	
+logging: {}
+imageMinimumGCAge: 2m
+imageGCHighThresholdPercent: 85
+imageGCLowThresholdPercent: 80
+serializeImagePulls: true
+maxPods: 110
+oomScoreAdj: -999
+readOnlyPort: 0
+failSwapOn: true
+enforceNodeAllocatable:
+- pods
+{% if KUBERNETES_KUBE_RESERVED_ENABLE == true %}
+- kube-reserved
+{% endif %}
+{% if KUBERNETES_SYSTEMD_RESERVED_ENABLE == true %}
+- system-reserved
+{% endif %}
+{% if KUBERNETES_KUBE_RESERVED_ENABLE == true %}
+kubeReservedCgroup: /kubelet.slice
+kubeReserved:
+  cpu: 200m
+  memory: 300Mi
+{% endif %}
+{% if KUBERNETES_SYSTEMD_RESERVED_ENABLE == true %}
+systemReservedCgroup: /system.slice
+systemReserved:
+  cpu: 200m
+  memory: 500Mi
+{% endif %}
+evictionHard:
+  imagefs.available: 15%
+  memory.available:  300Mi
+  nodefs.available:  10%
+  nodefs.inodesFree: 5%
+evictionSoft:
+  imagefs.available: 20%
+  memory.available:  500Mi
+  nodefs.available:  15%
+  nodefs.inodesFree: 10%
+evictionSoftGracePeriod:
+  memory.available: 5m
+  nodefs.available: 5m
+  nodefs.inodesFree: 5m
+  imagefs.available: 5m
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+bindAddress: 0.0.0.0
+metricsBindAddress: 0.0.0.0 
+mode: {{ kubernetes_tmp_network_model }}
+{% if kubernetes_tmp_network_model == "ipvs" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+ipvs:             
+  excludeCIDRs:
+  - {{ KUBERNETES_VIP }}/32
+{% endif %}

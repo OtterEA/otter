@@ -1,0 +1,87 @@
+# 拷贝二进制命令
+- block: 
+  - name: Create Temp Directory for otter
+    file: path=/tmp/otter state=directory mode=0755 recurse=yes 
+  
+  - name: Check Kubernetes Binary Package Exist
+    stat: path=/tmp/otter/kubernetes
+    register: kubernetes_tmp_file_state
+  
+  - name: Unarchive Kubernetes Binary Package
+    unarchive: src={{ playbook_dir | dirname }}/files/bin/k8s/{{ ansible_architecture }}/kubernetes-v{{ KUBERNETES_VERSION }}.tgz dest=/tmp/otter/ 
+    when: kubernetes_tmp_file_state.stat.exists == false
+  
+  - name: Copy Kubernetes Master Node Binary Files to /usr/bin/
+    copy: src={{ item }} dest=/usr/bin/{{ item | basename }} remote_src=yes mode=0755
+    with_items: 
+    - /tmp/otter/kubernetes/node/bin/kubeadm
+    - /tmp/otter/kubernetes/node/bin/kubectl
+    - /tmp/otter/kubernetes/node/bin/kubelet
+    when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
+  
+  - name: Copy Kubernetes Work Node Binary Files to /usr/bin/
+    copy: src={{ item }} dest=/usr/bin/{{ item | basename }} remote_src=yes mode=0755
+    with_items: 
+    - /tmp/otter/kubernetes/node/bin/kubeadm
+    - /tmp/otter/kubernetes/node/bin/kubelet
+    when: inventory_hostname in groups['kubernetes_node']
+
+- name: Create Kubernetes Directory 
+  file: path={{ item }} state=directory recurse=yes mode=0755
+  with_items:
+  - /var/lib/kubelet
+  - /etc/kubernetes/manifests
+  - /etc/kubernetes/pki
+  - ~/.kube
+  - /opt/cni/bin
+
+- name: Create Kubelet Service
+  template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service force=yes
+
+- name: Set the service to start automatically upon startup
+  systemd: name=kubelet enabled=yes
+
+- name: Set Kubectl Completion
+  lineinfile:
+    dest: ~/.bashrc
+    state: present
+    regexp: 'kubectl completion'
+    line: 'source <(kubectl completion bash)'
+  when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
+
+# 设置主机名称
+- block: 
+  - name: Set Master Node Name
+    hostname: name="{{ inventory_hostname|replace('.','-') }}.master"
+    when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
+
+  - name: Set Work Node Name
+    hostname: name="{{ inventory_hostname|replace('.','-') }}.node"
+    when: inventory_hostname in groups['kubernetes_node']
+  
+# 设置本地域名解析
+- block:
+  - block: 
+    - name: Set Kubernetes Hosts for Master Node
+      lineinfile:
+        dest: /etc/hosts
+        state: present
+        line: "127.0.0.1    {{ inventory_hostname|replace('.','-') }}.master"
+
+    - name: Set Kubernetes API Server Host
+      lineinfile:
+        dest: /etc/hosts
+        state: present
+        line: "127.0.0.1    apiserver.cluster.local"
+    when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
+    
+  - name: Set Kubernetes Hosts for Work Node
+    lineinfile:
+      dest: /etc/hosts
+      state: present
+      line: "127.0.0.1    {{ inventory_hostname|replace('.','-') }}.node"
+    when: inventory_hostname in groups['kubernetes_node']
+  
+- name: Create Kubernetes token.csv
+  template: src=token.csv.j2 dest=/etc/kubernetes/pki/token.csv force=yes
+  when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )

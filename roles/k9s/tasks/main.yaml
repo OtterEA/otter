@@ -1,0 +1,41 @@
+## todo : 基于委托者判断，但凡需要安装的，都委托给ansible controller端
+- block:
+  - name: Check K9S Binary Package Exist for Multi-architecture
+    stat: path={{ item }}
+    register: k9s_file_state
+    with_items:
+    - "{{ playbook_dir | dirname }}/files/bin/k9s/x86_64/k9s-v{{ K9S_VERSION }}.tgz"
+    - "{{ playbook_dir | dirname }}/files/bin/k9s/aarch64/k9s-v{{ K9S_VERSION }}.tgz"
+  
+  - name: K9S Package Not Exist
+    fail: msg="K9S Binary Package Not Exist"
+    when: false in ( k9s_file_state.results | map(attribute='stat.exists') | list )
+  any_errors_fatal: true
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == true
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+
+- block:
+  - name: Check K9S Binary Package Exist
+    stat: path={{ playbook_dir | dirname }}/files/bin/k9s/{{ ansible_architecture }}/k9s-v{{ K9S_VERSION }}.tgz
+    register: k9s_file_state
+  
+  - name: K9S Binary Package Not Exist
+    fail: msg="K9S Binary Package Not Exist"
+    when: k9s_file_state.stat.exists == false
+  any_errors_fatal: true
+  when: 
+  - OTTER_MIXED_ENABLE | default(false) | bool == false
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+
+# install helm3
+- block:
+  - name: Create Temp Directory for otter
+    file: path=/tmp/otter/k9s state=directory mode=0755 recurse=yes 
+
+  - name: Unarchive Helm Binary Package
+    unarchive: src={{ playbook_dir | dirname }}/files/bin/k9s/{{ ansible_architecture }}/k9s-v{{ K9S_VERSION }}.tgz dest=/tmp/otter/k9s
+  
+  - name: Copy Helm Binary Files to /usr/bin/
+    copy: src=/tmp/otter/k9s/k9s dest=/usr/bin/k9s remote_src=yes mode=0755
+  any_errors_fatal: true

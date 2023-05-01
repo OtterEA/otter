@@ -1,5 +1,5 @@
 - hosts:
-  - kube_cluster
+  - kubernetes_cluster
   ignore_unreachable: false
   roles: 
   - { role: docker, tags: docker, when: RUNTIME_TYPE|string == "docker" }

@@ -1,0 +1,50 @@
+  - name: Bootstrap Sign Automatically
+    shell:
+      cmd: |
+        cat << EOF | kubectl apply -f -
+        # 允许启动引导节点创建 CSR
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: create-csrs-for-bootstrapping
+        subjects:
+        - kind: Group
+          name: system:bootstrappers
+          apiGroup: rbac.authorization.k8s.io
+        roleRef:
+          kind: ClusterRole
+          name: system:node-bootstrapper
+          apiGroup: rbac.authorization.k8s.io
+        EOF
+        
+        cat << EOF | kubectl apply -f -
+        # 批复 "system:bootstrappers" 组的所有 CSR
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: auto-approve-csrs-for-group
+        subjects:
+        - kind: Group
+          name: system:bootstrappers
+          apiGroup: rbac.authorization.k8s.io
+        roleRef:
+          kind: ClusterRole
+          name: system:certificates.k8s.io:certificatesigningrequests:nodeclient
+          apiGroup: rbac.authorization.k8s.io
+        EOF
+        
+        cat << EOF | kubectl apply -f -
+        # 批复 "system:nodes" 组的 CSR 续约请求
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: auto-approve-renewals-for-nodes
+        subjects:
+        - kind: Group
+          name: system:nodes
+          apiGroup: rbac.authorization.k8s.io
+        roleRef:
+          kind: ClusterRole
+          name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
+          apiGroup: rbac.authorization.k8s.io
+        EOF

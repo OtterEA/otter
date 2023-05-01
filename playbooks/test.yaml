@@ -1,0 +1,9 @@
+- hosts:
+  - kubernetes_master
+  ignore_unreachable: false
+  roles: 
+  - {role: test, tags: test }
+  #- { role: cni/flannel, tags: flannel }
+  #- { role: k9s, tags: k9s}
+  #- { role: helm, tags: helm }
+  #- { role: cni/flannel, tags: cni-flannel-test }

@@ -1,0 +1,45 @@
+[Unit]
+Description=kubelet: The Kubernetes Node Agent
+Documentation=http://kubernetes.io/docs/
+
+[Service]
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/pids/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpu/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpuset/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpuacct/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/memory/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/systemd/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/devices/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/blkio/kubelet.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/hugetlb/kubelet.slice
+
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/pids/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpu/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpuset/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/cpuacct/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/memory/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/systemd/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/devices/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/blkio/system.slice
+ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/hugetlb/system.slice
+ExecStart=/usr/bin/kubelet \
+{% if ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == false %}
+  --pod-infra-container-image={{ KUBERNETES_IMAGE_REPO }}/pause:3.8 \
+{% elif ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == true %}
+  --pod-infra-container-image={{ HARBOR_DOMAIN }}/k8s/pause:3.8 \
+{% endif %}
+  --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf \
+  --kubeconfig=/etc/kubernetes/kubelet.conf \
+  --config=/var/lib/kubelet/config.yaml \
+  --feature-gates=EphemeralContainers=true \
+  --network-plugin=cni \
+  --cni-bin-dir=/opt/cni/bin \
+  --cni-cache-dir=/var/lib/cni/cache \
+  --cni-conf-dir=/etc/cni/net.d \
+  --v=2
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

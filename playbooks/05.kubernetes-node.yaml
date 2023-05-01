@@ -1,0 +1,5 @@
+- hosts:
+  - kubernetes_node
+  ignore_unreachable: false
+  roles: 
+  - { role: kubernetes/kubernetes-node, tags: kubernetes-node }

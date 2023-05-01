@@ -1,0 +1,11 @@
+############################## 节点环境初始化 ############################
+- name: Init Environment for Kubernetes
+  include_role:
+    name: kubernetes/kubernetes-environment
+    apply: 
+      tags: always
+
+############################## 节点加入集群 ###############################
+#- name: Kubernetes Work Node Join Cluster
+#  script: "{{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_node_join.sh"
+#  any_errors_fatal: true

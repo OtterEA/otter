@@ -1,0 +1,5 @@
+- hosts:
+  - kubernetes_master_control_plane
+  ignore_unreachable: false
+  roles: 
+  - { role: kubernetes/kubernetes-master-control-plane, tags: kubernetes-control-plane }

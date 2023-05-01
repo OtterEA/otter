@@ -74,17 +74,16 @@ KUBERNETES_DSCHEDULE_ENABLE: false
 # 是否启用K8S节点压力保护
 KUBERNETES_PRESSURE_PROTECTION_ENABLE: true
 
-# 是否启用k8s kube-reserved保护
-KUBERNETES_KUBE_RESERVED_ENABLE: true
+# 是否启用k8s kube-reserved保护,如需要就开启,部分系统存在兼容性问题
+# 部分系统开启后可能会出现:Failed to start ContainerManager Failed to enforce Kube Reserved Cgroup Limits on "/kubelet.slice": ["kubelet"] cgroup does not exist
+KUBERNETES_KUBE_RESERVED_ENABLE: false
 
-# 是否启用k8s systemd reserved保护
-KUBERNETES_SYSTEMD_RESERVED_ENABLE: true
+# 是否启用k8s systemd reserved保护, 如需要就开启,部分系统存在兼容性问题
+# 部分系统开启后可能会出现:Failed to start ContainerManager Failed to enforce Kube Reserved Cgroup Limits on "/kubelet.slice": ["kubelet"] cgroup does not exist
+KUBERNETES_SYSTEMD_RESERVED_ENABLE: false
 
 # K8S 是否启用双栈网络(IPV4/IPV6),暂时未适配
 KUBERNETES_DUAL_STACK_ENABLE: false
-
-# k8s 集群内部通信域名(主要用于node节点与API Server的6443端口通信),部署时一般默认即可
-KUBERNETES_DOMAIN: otter.apiserver.com
 
 # k8s init token(设置默认的bootstrap token)
 # 生成方式：head -c 16 /dev/urandom | od -An -t x | tr -d ' '

@@ -12,7 +12,9 @@
 
 - name: Disable NetworkManager
   systemd: name=NetworkManager state=stopped enabled=no
-  when: ansible_distribution_major_version|int == 7
+  when: 
+  - ansible_distribution_major_version|int == 7
+  - ansible_distribution == "CentOS"
 
 # 备份原yum文件
 - block:
@@ -45,7 +47,9 @@
     with_items:
     - yum/centos7/otter-centos7-epel.repo
     - yum/centos7/otter-centos7.repo
-    when: ansible_distribution_major_version|int == 7
+    when: 
+    - ansible_distribution_major_version|int == 7
+    - ansible_distribution == "CentOS"
   
   - name: Distribute Yum Repo Configuration
     copy: src={{ item }} dest=/etc/yum.repos.d/{{ item.split('/') | last }}
@@ -57,7 +61,24 @@
     - yum/centos8/otter-centos8-epel-testing.repo
     - yum/centos8/otter-centos8-epel.repo
     - yum/centos8/otter-centos8.repo
-    when: ansible_distribution_major_version|int == 8
+    when: 
+    - ansible_distribution_major_version|int == 8
+    - ansible_distribution == "CentOS"
+  
+  - name: Distribute Yum Repo Configuration
+    copy: src={{ item }} dest=/etc/yum.repos.d/{{ item.split('/') | last }}
+    loop_control:
+      label: "{{ item.split('/') | last }}"
+    with_items:
+    - yum/rocky9/otter-rocky9-addons.repo
+    - yum/rocky9/otter-rocky9-devel.repo
+    - yum/rocky9/otter-rocky9-epel-testing.repo
+    - yum/rocky9/otter-rocky9-epel.repo
+    - yum/rocky9/otter-rocky9-extras.repo
+    - yum/rocky9/otter-rocky9.repo
+    when: 
+    - ansible_distribution_major_version|int == 9
+    - ansible_distribution == "Rocky"
 
 # 安装基础软件
 - block:
@@ -66,11 +87,20 @@
     when: 
     - OTTER_INSTALL_METHOD|string == "online"
     - ansible_distribution_major_version|int == 7
+    - ansible_distribution == "CentOS"
   
   - name: Install Basic Software For System
     shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat
     when: 
     - OTTER_INSTALL_METHOD|string == "online"
     - ansible_distribution_major_version|int == 8
+    - ansible_distribution == "CentOS"
+  
+  - name: Install Basic Software For System
+    shell: yum -y install {{ ONLINE['ROCKY9_SOFTWARE'] | join(" ") }} | cat
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_major_version|int == 9
+    - ansible_distribution == "Rocky"
 
 ## todo 离线包

@@ -1,0 +1,12 @@
+# rocky-devel.repo
+#
+# devel and no-package-left-behind
+
+[devel]
+name=Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT ONLY DO NOT LEAVE ENABLED
+#mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever$rltype
+baseurl=https://mirrors.aliyun.com/rockylinux/$releasever/devel/$basearch/os/
+gpgcheck=1
+enabled=0
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9

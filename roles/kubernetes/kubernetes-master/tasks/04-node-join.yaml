@@ -6,11 +6,8 @@
   shell: openssl x509 -pubkey -in /tmp/otter/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
   register: ca_hex_encoded_hash
 
-#- name: Generate Kubeadm Master Join Cluster Configuration
-#  template: src=kubeadm-new-control-plane.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-control-plane force=yes
-
-#- name: Generate Kubeadm Node Join Cluster Configuration
-#  template: src=kubeadm-new-node.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-node force=yes
+- name: Generate Kubeadm Master Join Cluster Configuration
+  template: src=kubernetes_master_join.sh.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_master_join.sh force=yes
 
 - name: Generate Kubeadm Node Join Cluster Script
   template: src=kubernetes_node_join.sh.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_node_join.sh force=yes mode=0755

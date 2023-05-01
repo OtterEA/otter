@@ -10,3 +10,7 @@
 - name: System Optimization for Ubuntu
   include_tasks: ubuntu.yaml
   when: ansible_distribution == "Ubuntu"
+
+- name: System Optimization for Rocky
+  include_tasks: centos.yaml
+  when: ansible_distribution == "Rocky"

@@ -2,11 +2,6 @@
 - name: Create Kubeadm Init Configuration file
   template: src=kubeadm-new-cluster.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-cluster force=yes
 
-#- name: Create Bootstrap Kubelet Configuration
-#  template: src=bootstrap-kubelet.conf.j2 dest={{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/bootstrap-kubelet.conf force=yes
-- name: test
-  shell: exit 1
-
 #### K8S 集群初始化
 - block: 
   - name: Init Kubernetes Cluster

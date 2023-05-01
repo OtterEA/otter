@@ -35,6 +35,24 @@
   - ~/.kube
   - /opt/cni/bin
 
+# 拷贝CNI组件
+- block:
+  - name: Create Temp Directory for otter
+    file: path=/tmp/otter/cni-plugin state=directory mode=0755 recurse=yes 
+
+  - name: Unarchive CNI PLUGIN Binary Package
+    unarchive: src={{ playbook_dir | dirname }}/files/bin/cni-plugin/{{ ansible_architecture }}/cni-plugin-v{{ CNI_PLUGIN_VERSION }}.tgz dest=/tmp/otter/cni-plugin
+  
+  - name: Get All Files of /tmp/otter/cni-plugin
+    find: paths=/tmp/otter/cni-plugin file_type=file 
+    register: cni_plugin_binary_files
+  
+  - name: Copy CNI PLUGIN Binary Files to /opt/cni/bin
+    copy: src={{ item.path }} dest=/opt/cni/bin/{{ item.path | basename }} remote_src=yes mode=0755
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ cni_plugin_binary_files.files }}"
+
 - name: Create Kubelet Service
   template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service force=yes
 

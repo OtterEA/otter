@@ -52,4 +52,8 @@ ONLINE:
   - bash-completion
   - socat 
   - conntrack-tools
+  ROCKY9_SOFTWARE:
+  - bash-completion
+  - socat 
+  - conntrack-tools
 OFFLINE:

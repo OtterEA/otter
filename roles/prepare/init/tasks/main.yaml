@@ -1,4 +1,6 @@
-## todo 为每个节点创建离线资源包文件夹
+## todo 
+# fix: 为每个节点创建离线资源包文件夹,otterdownload mkdir it
+# 1. 节点时区设置
 
 - name: System Optimization for ALL System
   include_tasks: common.yaml

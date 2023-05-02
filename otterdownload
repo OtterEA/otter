@@ -51,7 +51,7 @@ function download_kubernetes_binary_file(){
     local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $CONFIG_FILE)
     local os_architecture=$(arch)
     local kubernetes_version=$(get_config KUBERNETES_VERSION $CONFIG_FILE)    
-    if [[ $os_architecture = true ]]; then
+    if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://dl.k8s.io/v${kubernetes_version}/kubernetes-node-linux-arm64.tar.gz \
             $BASE_DIR/files/bin/k8s/aarch64/kubernetes-v${kubernetes_version}.tgz || exit 1
@@ -82,7 +82,7 @@ function download_cni_plugin_binary_file(){
     local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $CONFIG_FILE)
     local os_architecture=$(arch)
     local cni_plugin_version=$(get_config CNI_PLUGIN_VERSION $CONFIG_FILE)
-    if [[ $os_architecture = true ]]; then
+    if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/containernetworking/plugins/releases/download/v${cni_plugin_version}/cni-plugins-linux-arm64-v${cni_plugin_version}.tgz \
             $BASE_DIR/files/bin/cni-plugin/aarch64/cni-plugin-v${cni_plugin_version}.tgz || exit 1
@@ -112,7 +112,7 @@ function download_k9s_binary_file(){
     local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $CONFIG_FILE)
     local os_architecture=$(arch)
     local k9s_version=$(get_config K9S_VERSION $CONFIG_FILE)
-    if [[ $os_architecture = true ]]; then
+    if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/derailed/k9s/releases/download/v${k9s_version}/k9s_Linux_arm64.tar.gz \
             $BASE_DIR/files/bin/k9s/aarch64/k9s-v${k9s_version}.tgz || exit 1
@@ -142,7 +142,7 @@ function download_helm_binary_file(){
     local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $CONFIG_FILE)
     local os_architecture=$(arch)
     local helm_version=$(get_config HELM_VERSION $CONFIG_FILE)
-    if [[ $os_architecture = true ]]; then
+    if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://mirrors.huaweicloud.com/helm/v${helm_version}/helm-v${helm_version}-linux-arm64.tar.gz \
             $BASE_DIR/files/bin/helm/aarch64/helm-v${helm_version}.tgz || exit 1

@@ -31,21 +31,21 @@
 - block:
   - name: Deploy Flannel Network Plugin
     include_role:
-      name: cni/flannel
+      name: kubernetes/kubernetes-cni-flannel
       apply:
         tags: always
     when: KUBERNETES_CNI_TYPE|string == "flannel"
   
   - name: Deploy Calico Network Plugin
     include_role:
-      name: cni/calico
+      name: kubernetes/kubernetes-cni-calico
       apply:
         tags: always
     when: KUBERNETES_CNI_TYPE|string == "calico"
   
   - name: Deploy Cilium Network Plugin
     include_role:
-      name: cni/cilium
+      name: kubernetes/kubernetes-cni-cilium
       apply:
         tags: always
     when: KUBERNETES_CNI_TYPE|string == "cilium"
@@ -116,21 +116,21 @@
 ################### 部署Helm3 ###################################
 - name: Deploy Helm
   include_role:
-    name: helm
+    name: kubernetes/kubernetes-helm
     apply:
       tags: always
 
 ################### 部署K9S #####################################
 - name: Deploy K9S
   include_role:
-    name: k9s
+    name: kubernetes/kubernetes-k9s
     apply:
       tags: always
 
 ##################### 部署Metrics Server组件 ####################
 - name: Deploy Metrics Server
   include_role:
-    name: metrics-server
+    name: kubernetes/kubernetes-metrics-server
     apply:
       tags: always
   when: KUBERNETES_METRICS_SERVER_ENABLE == true
@@ -138,7 +138,7 @@
 #################### 部署Kubernetes DashBoard ##################
 - name: Deploy Kubernetes Dashboard
   include_role:
-    name: metrics-server
+    name: kubernetes/kubernetes-dashboard
     apply:
       tags: always
   when: KUBERNETES_DASHBOARD_ENABLE == true

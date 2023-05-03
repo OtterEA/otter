@@ -1,4 +1,4 @@
-- name: Modify Coredns ConfigMap Configuration
+- name: Deploy Flanel for Kubernetes 
   shell:
     cmd: |
       cat << EOF | kubectl apply -f -

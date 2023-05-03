@@ -1,0 +1,2 @@
+- name: Deploy Dashboard for Kubernetes
+  include_tasks: kube-dashboard-v2.7.0.yaml

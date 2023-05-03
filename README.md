@@ -4,7 +4,7 @@
 
 1. 集群特性：Master高可用、离线部署、多架构支持(arm64/amd64)、多架构支持(arm64/amd64)、多操作系统、多操作系统/多架构混部
 2. 集群版本：Kubernetes v1.22.x，v1.22.x，v1.25.x
-3. 操作系统：CentOS/RedHat/7/8
+3. 操作系统：CentOS/RedHat/7/8/Rocky9
 4. CRI：containerd、Docker
 5. CNI：flannel
 6. 配置文件支持高度自定义

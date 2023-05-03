@@ -4,7 +4,7 @@ OTTER_INSTALL_METHOD: online
 
 # 是否启用混合架构部署(如果启用,离线下载时将会下载多架构二进制命令与镜像)
 # 如果集群内有多架构请设置为true，否则会导致节点无法获取离线资源包
-OTTER_MIXED_ENABLE: false
+OTTER_MIXED_ENABLE: true
 
 ##################################  Chronyd 时间同步设置 ###########################
 ## 时间同步服务器IPS,如果有多个请填多个
@@ -145,7 +145,6 @@ K8S:
 # Harbor镜像坐标
 HARBOR: 
   harbor-v2.6.3:
-  harbor-v2.1.6:
 
 # Monitor镜像坐标
 MONITOR:

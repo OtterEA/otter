@@ -1,8 +1,4 @@
 ## todo
 # 1. 检查配置文件合法性 auth: jiayu997
-# 2. 检查docker二进制本地安装包是否存在，如果是多架构部署的，需要检查二个 author: jiayu997
-
-
-#- name: Check All Machine Architecture
-
-#- name: Check Docker Binary Package Exist
+# 2. 检查docker二进制本地安装包是否存在，如果是多架构部署的，需要检查二个 author: jiayu997 -- 已完成，在对应的role中完成
+# 3. 检查节点是否含tar命令，unarchi 模块需要

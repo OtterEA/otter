@@ -1,1 +1,10 @@
 #!/bin/bash
+# get script absolute path
+BASE_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) &>/dev/null && pwd)
+CONFIG_FILE=$BASE_DIR/config/otter.yaml
+
+# include lib
+source $BASE_DIR/scripts/libotter.sh
+
+# print logo 
+logo

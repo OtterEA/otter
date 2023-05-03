@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function logger(){
     TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
     case "$1" in
@@ -18,7 +20,7 @@ function logger(){
     esac
 }
 
-function log(){
+function logo(){
     echo -e "\033[33m##################################################################################################\033[0m"
     echo -e "\033[33m#    ____  _   _              _  __     _                          _              _____  _       #\033[0m"
     echo -e "\033[33m#   / __ \| | | |            | |/ /    | |                        | |            |  __ \| |      #\033[0m"
@@ -145,6 +147,26 @@ function set_config(){
 }
 #set_config SERVICE_CIDR 10.96.0.0/12 ../config/otter.yaml
 
+##########################
+# Set Otter.yaml Config
+# Argument:
+#   $1 - key
+#   $2 - config path
+# Return:
+#   None
+function delete_config(){
+    local key=${1:?key missing}
+    local config_file=${2:?config file missing}
+
+    if [ ! -f $config_file ]; then
+        logger error "$config_file doesn't exist" 
+        return 1
+    fi
+
+    sed -Ei "#^${key}:.*\$#d" $config_file
+}
+#delete_config MONITOR_ENABLE ../config/otter-backup.yaml
+
 ############################
 # get systemd architecture
 # Argument:
@@ -153,4 +175,30 @@ function set_config(){
 #   aarch64/x86_64
 function get_architecture(){
     local arch=$(arch)
+}
+
+###########################
+# trap ctrl+c signal
+# Argument:
+#   None
+# Return:
+#   None
+trap 'onCtrlC' INT
+function onCtrlC () {
+	logger warn "receive ctrl+c signal,will kill otter container"
+	docker ps -a | grep otter | awk '{print $1}' | xargs docker rm -f &>/dev/null
+	exit 1
+}
+
+###########################
+# trap ctrl+z signal
+# Argument:
+#   None
+# Return:
+#   None
+trap 'onCtrlZ' TSTP
+function onCtrlZ(){
+	logger warn "receive ctrl+z signal,will kill otter container"
+	docker ps -a | grep otter | awk '{print $1}' | xargs docker rm -f &>/dev/null
+	exit 1
 }

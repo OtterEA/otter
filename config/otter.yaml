@@ -120,6 +120,9 @@ HELM_VERSION: 3.11.3
 K9S_VERSION: 0.27.3
 
 ######## 集群镜像坐标 ###########################
+# otter容器镜像坐标
+OTTER_IMAGE: jiayu98/otter:v0.1
+
 # k8s镜像坐标
 K8S:
   # 适用于k8s <= 1.25

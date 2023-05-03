@@ -1,0 +1,21 @@
+################################ Harbor 配置  ####################################
+# Harbor 域名,如果没有域名需求默认即可,方式方式https://harbor_domian
+# 即使不启用Harbor，所有节点的镜像坐标将会是以Harbor Domain 为基准(无论在线还是离线)
+HARBOR_DOMAIN: otter.harbor.com
+
+# HARBOR 部署节点IP，该IP必须要是K8S集群内
+HARBOR_IP: 127.0.0.1
+
+# Harbor 访问Port,不允许修改
+#HARBOR_PORT: 443
+
+# Harbor admin登陆密码
+HARBOR_PASSWORD: Otter007
+
+# Harbor 数据目录
+HARBOR_DATA_PATH: /data/harbor
+
+
+# Harbor镜像坐标
+HARBOR: 
+  harbor-v2.6.3:

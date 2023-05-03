@@ -14,7 +14,7 @@ discovery:
     apiServerEndpoint: apiserver.cluster.local:6443
     token: 9a08jv.c0izixklcxtmnze7
     caCertHashes:
-    - sha256:6a51a9b1ca91a023cf8080c300dce0b5899a3f71f1f55dba36d7a005a10710f2
+    - sha256:4f211d1097ed183e1503ba8c0e4e88154e7c00e554efacfa82d75df8a1005ecb
 EOF
 kubeadm join --config /tmp/otter/kubeadm-new-node
 

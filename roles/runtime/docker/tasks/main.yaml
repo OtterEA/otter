@@ -72,7 +72,7 @@
   - name: Enable Docker Service Enable
     systemd: name=docker enabled=yes state=restarted daemon_reload=yes
     any_errors_fatal: true
-    when: inventory_hostname != ansible_env['SSH_CLIENT'].split() | first
+    #when: inventory_hostname != ansible_env['SSH_CLIENT'].split() | first
   
   - name: Wait for Docker Run
     shell: systemctl is-active docker.service

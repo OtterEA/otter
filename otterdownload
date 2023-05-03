@@ -169,12 +169,3 @@ download_kubernetes_binary_file
 download_cni_plugin_binary_file
 download_helm_binary_file
 download_k9s_binary_file
-
-
-
-
-
-
-
-
-

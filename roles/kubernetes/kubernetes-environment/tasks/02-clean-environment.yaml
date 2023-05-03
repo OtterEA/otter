@@ -12,6 +12,7 @@
   - ~/.kube
   - /etc/kubernetes/pki
   - /etc/kubernetes/bootstrap-kubelet.conf
+  - "{{ KUBERNETES_ETCD_DATA_DIR }}" # fix: ubuntu 18.04 reset doesn't clean etcd data
 
 - name: Delete Kubernetes Network Interface
   shell: |

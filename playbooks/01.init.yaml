@@ -1,6 +1,6 @@
 - hosts:
   - kubernetes_cluster
-  ignore_unreachable: false
+  #ignore_unreachable: false
   roles: 
   - { role: prepare/init, tags: init }
   #- { role: prepare/ping, tags: ping }

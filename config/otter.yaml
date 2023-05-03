@@ -16,7 +16,7 @@ TIME_SERVER: ["localhost","127.0.0.1"]
 RUNTIME_TYPE: docker
 
 ##################################  Docker 配置  #################################
-# Docker版本,已验证版本: 
+# Docker版本,已验证版本: 20.10.24,如果有其他版本部署需求，可修改
 DOCKER_VERSION: 20.10.24
 
 # Docker 数据目录
@@ -38,8 +38,8 @@ DOCKER_REMOTE_API_ENABLE: false
 
 
 ################################ K8S 配置   #######################################
-# k8s 版本
-KUBERNETES_VERSION: 1.22.17
+# k8s版本，当前默认版本<1.24在线模式下，理论上均可安装
+KUBERNETES_VERSION: 1.23.17
 
 # pod网段设置(如有网络冲突，可自行修改,一般默认即可) 
 POD_NETWORK_CIDR: 10.244.0.0/16
@@ -100,7 +100,7 @@ KUBERNETES_CERTIFICATE_KEY: 5333dd1e432c9a3563870608bea3e412d664040d891492aa6fb1
 # 国内K8S镜像源地址
 KUBERNETES_IMAGE_REPO: registry.cn-hangzhou.aliyuncs.com/google_containers
 
-##################### 各类中间件是否启用开关  #############################
+##################### 各类中间件是否启用开关(具体配置请去/config/middleware/下面配置)  #############################
 # 是否部署HARBOR，HARBOR部署方式为Chart部署,我们默认推荐部署
 # 如果不部署Harbor，K8S镜像将用阿里云初始化
 HARBOR_ENABLE: false

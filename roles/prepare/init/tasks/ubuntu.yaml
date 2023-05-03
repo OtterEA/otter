@@ -11,6 +11,14 @@
 - name: Disable Firewalld
   ufw: state=disabled
 
+# /usr/bin/mkdir -> /bin/mkdir
+# ln -s /bin/mkdir /usr/bin/mkdir
+- name: Create mkdir Link
+  file: src=/bin/mkdir dest=/usr/bin/mkdir state=link force=yes
+  when:
+  - ansible_distribution_version|float == 18.04
+  - ansible_distribution == "Ubuntu"
+
 # 备份原apt source文件
 - block:
   - name: Get All Source Repo Files

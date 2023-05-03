@@ -59,8 +59,9 @@
       label: "{{ item.path | basename }}"
     with_items: "{{ docker_binary_files.files }}"
 
+  # fix: dest=/usr/lib/systemd/system/docker.service -=> /etc/systemd/system/docker.service ,ubuntu 18.04不存在/usr/lib/systemd/system/目录
   - name: Copy Docker Service Configuration
-    copy: src=docker.service dest=/usr/lib/systemd/system/docker.service force=yes
+    copy: src=docker.service dest=/etc/systemd/system/docker.service force=yes
 
   - name: Create Docker Configuration Directory
     file: path=/etc/docker state=directory recurse=yes mode=0755

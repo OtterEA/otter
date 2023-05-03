@@ -53,8 +53,9 @@
       label: "{{ item.path | basename }}"
     with_items: "{{ cni_plugin_binary_files.files }}"
 
+# fix: dest=/usr/lib/systemd/system/docker.service -=> /etc/systemd/system/docker.service ,ubuntu 18.04不存在/usr/lib/systemd/system/目录
 - name: Create Kubelet Service
-  template: src=kubelet.service.j2 dest=/usr/lib/systemd/system/kubelet.service force=yes
+  template: src=kubelet.service.j2 dest=/etc/systemd/system/kubelet.service force=yes
 
 - name: Set the service to start automatically upon startup
   systemd: name=kubelet enabled=yes

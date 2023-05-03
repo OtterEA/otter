@@ -4,7 +4,7 @@ OTTER_INSTALL_METHOD: online
 
 # 是否启用混合架构部署(如果启用,离线下载时将会下载多架构二进制命令与镜像)
 # 如果集群内有多架构请设置为true，否则会导致节点无法获取离线资源包
-OTTER_MIXED_ENABLE: true
+OTTER_MIXED_ENABLE: false
 
 ##################################  Chronyd 时间同步设置 ###########################
 ## 时间同步服务器IPS,如果有多个请填多个
@@ -39,7 +39,7 @@ DOCKER_REMOTE_API_ENABLE: false
 
 ################################ K8S 配置   #######################################
 # k8s 版本
-KUBERNETES_VERSION: 1.20.15
+KUBERNETES_VERSION: 1.22.17
 
 # pod网段设置(如有网络冲突，可自行修改,一般默认即可) 
 POD_NETWORK_CIDR: 10.244.0.0/16

@@ -83,24 +83,25 @@
 # 安装基础软件
 - block:
   - name: Install Basic Software For System
-    shell: yum -y install {{ ONLINE['CENTOS7_SOFTWARE'] }} | join(" ") }} | cat
+    yum: name={{ ONLINE['CENTOS7_SOFTWARE'] }} state=present update_cache=yes
     when: 
     - OTTER_INSTALL_METHOD|string == "online"
     - ansible_distribution_major_version|int == 7
     - ansible_distribution == "CentOS"
   
   - name: Install Basic Software For System
-    shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat
+    yum: name={{ ONLINE['CENTOS8_SOFTWARE'] }} state=present update_cache=yes
     when: 
     - OTTER_INSTALL_METHOD|string == "online"
     - ansible_distribution_major_version|int == 8
     - ansible_distribution == "CentOS"
   
   - name: Install Basic Software For System
-    shell: yum -y install {{ ONLINE['ROCKY9_SOFTWARE'] | join(" ") }} | cat
+    yum: name={{ ONLINE['ROCKY9_SOFTWARE'] }} state=present update_cache=yes
     when: 
     - OTTER_INSTALL_METHOD|string == "online"
     - ansible_distribution_major_version|int == 9
     - ansible_distribution == "Rocky"
 
 ## todo 离线包
+#shell: yum -y install {{ ONLINE['CENTOS8_SOFTWARE'] | join(" ") }} | cat

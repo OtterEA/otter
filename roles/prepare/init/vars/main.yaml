@@ -56,4 +56,20 @@ ONLINE:
   - bash-completion
   - socat 
   - conntrack-tools
+  UBUNTU2204_SOFTWARE:
+  - bash-completion
+  - socat 
+  - conntrack
+  UBUNTU2104_SOFTWARE:
+  - bash-completion
+  - socat 
+  - conntrack
+  UBUNTU2004_SOFTWARE:
+  - bash-completion
+  - socat 
+  - conntrack
+  UBUNTU1804_SOFTWARE:
+  - bash-completion
+  - socat 
+  - conntrack
 OFFLINE:

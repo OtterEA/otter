@@ -1,0 +1,98 @@
+- name: Disable Selinux
+  shell: setenforce 0 | cat
+
+- name: Disable Selinux Configuration
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: "^SELINUX="
+    line: "SELINUX=disabled"
+  ignore_errors: yes
+  
+- name: Disable Firewalld
+  ufw: state=disabled
+
+# 备份原apt source文件
+- block:
+  - name: Get All Source Repo Files
+    find: paths=/etc/apt/sources.list.d/ file_type=file 
+    register: apt_repo_files
+  
+  - name: Create APT Repo Backup Directory
+    file: path=/etc/apt/sources.list-backup/ state=directory mode=0755
+  
+  - name: Copy APT Repo Files to /etc/apt/sources.list-backup
+    copy: src={{ item.path }} dest=/etc/apt/sources.list-backup/{{ item.path | basename }} remote_src=yes mode=0755
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ apt_repo_files.files }}"
+
+  - name: Delete APT Repo Files
+    file: path={{ item.path }} state=absent
+    loop_control:
+      label: "{{ item.path | basename }}"
+    with_items: "{{ apt_repo_files.files }}"
+  
+  - name: Copy APT Repo Backup File
+    copy: src=/etc/apt/sources.list dest=/etc/apt/sources.list-backup/sources.list remote_src=yes mode=0755
+  
+# 配置APT源
+- block:
+  - name: Distribute APT Repo Configuration
+    copy: src=apt/ubuntu-18-04/sources.list dest=/etc/apt/sources.list force=yes
+    when: 
+    - ansible_distribution_version|float == 18.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Distribute APT Repo Configuration
+    copy: src=apt/ubuntu-20-04/sources.list dest=/etc/apt/sources.list force=yes
+    when: 
+    - ansible_distribution_version|float == 20.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Distribute APT Repo Configuration
+    copy: src=apt/ubuntu-21-04/sources.list dest=/etc/apt/sources.list force=yes
+    when: 
+    - ansible_distribution_version|float == 21.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Distribute APT Repo Configuration
+    copy: src=apt/ubuntu-22-04/sources.list dest=/etc/apt/sources.list force=yes
+    when: 
+    - ansible_distribution_version|float == 22.04
+    - ansible_distribution == "Ubuntu"
+
+# 安装基础软件
+- block:
+  - name: Install Basic Software For System
+    apt: name={{ item }} state=present update_cache=yes
+    with_items: "{{ ONLINE['UBUNTU1804_SOFTWARE'] }}"
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_version|float == 18.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Install Basic Software For System
+    apt: name={{ item }} state=present update_cache=yes
+    with_items: "{{ ONLINE['UBUNTU2004_SOFTWARE'] }}"
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_version|float == 20.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Install Basic Software For System
+    apt: name={{ item }} state=present update_cache=yes
+    with_items: "{{ ONLINE['UBUNTU2104_SOFTWARE'] }}"
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_version|float == 21.04
+    - ansible_distribution == "Ubuntu"
+
+  - name: Install Basic Software For System
+    apt: name={{ item }} state=present update_cache=yes
+    with_items: "{{ ONLINE['UBUNTU2204_SOFTWARE'] }}"
+    when: 
+    - OTTER_INSTALL_METHOD|string == "online"
+    - ansible_distribution_version|float == 22.04
+    - ansible_distribution == "Ubuntu"
+
+#shell: yum -y install {{ ONLINE['CENTOS7_SOFTWARE'] }} | join(" ") }} | cat

@@ -1,32 +1,44 @@
-FROM python:3.8.16-alpine3.17
+FROM --platform=$TARGETPLATFORM python:3.8.16-alpine3.17
 
-ENV ANSIBLE_VER=2.9.27
+ENV ANSIBLE_VERSION 2.9.27
+ENV CFSSL_VERSION 1.6.4
 
-RUN set -x \
+RUN set -eux \
     # Build dependencies
-    && apk --no-cache add --virtual build-dependencies gcc musl-dev python3-dev libffi-dev openssl-dev cargo build-base \
-    # Useful tools
+    && apk --no-cache add --virtual build-dependencies \
+    gcc musl-dev python3-dev libffi-dev openssl-dev cargo build-base dpkg \
+    ############ start Install Useful tools #########
     && apk --no-cache --upgrade add bash \
     openssh-client \
-    rsync \
     sshpass \
     bash-completion \
     wget \
     curl \
-    busybox-extras \
-    && wget http://www.vdberg.org/~richard/tcpping -O /usr/bin/tcping \
-    && chmod a+x /usr/bin/tcping \
+    tar \
+    # telnet
+    busybox-extras \   
+    # certificate 
+    openssl \
+    ############### Install Cfssl ########################
+    && dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
+    && curl -k -L -o /usr/bin/cfssl-bundle https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssl-bundle_${CFSSL_VERSION}_linux_${dpkgArch} \
+    && curl -k -L -o /usr/bin/cfssl-certinfo https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssl-certinfo_${CFSSL_VERSION}_linux_${dpkgArch} \
+    && curl -k -L -o /usr/bin/cfssl-newkey https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssl-newkey_${CFSSL_VERSION}_linux_${dpkgArch} \
+    && curl -k -L -o /usr/bin/cfssl-scan https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssl-scan_${CFSSL_VERSION}_linux_${dpkgArch} \
+    && curl -k -L -o /usr/bin/cfssljson https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssljson_${CFSSL_VERSION}_linux_${dpkgArch} \
+    && curl -k -L -o /usr/bin/cfssl https://github.com/cloudflare/cfssl/releases/download/v${CFSSL_VERSION}/cfssl_${CFSSL_VERSION}_linux_${dpkgArch} \
+    ############### Install Ansible plugins module that need python dependency ##############
     && pip install pip --upgrade \
-    && pip install --no-cache-dir ansible=="$ANSIBLE_VER" \
-    # Install Ansible plugins module that need python dependency
+    && pip install --no-cache-dir ansible=="$ANSIBLE_VERSION" \
     && pip install -i https://mirrors.aliyun.com/pypi/simple netaddr \
     # Some module need '/usr/bin/python' exist
     && ln -s -f /usr/local/bin/python3 /usr/bin/python \
     && ln -s -f /usr/local/bin/python3 /usr/bin/python3 \
-    # Cleaning
+    ############# Cleaning ###################################
     && apk del build-dependencies \
     && rm -rf /var/cache/apk/* \
     && rm -rf /root/.cache \
-    && rm -rf /root/.cargo
+    && rm -rf /root/.cargo \
+    && chmod a+x /usr/bin/cfssl*
 
 CMD ["sleep","172800"]

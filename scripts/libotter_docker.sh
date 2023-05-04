@@ -195,11 +195,15 @@ function pull_otter_image(){
 
     local os_architecture=$(arch)
 
-    [[ $otter_mixed_enable = true ]] && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+    [[ $otter_mixed_enable = true ]] \
+    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar \
+    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
 
-    [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
+    [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] \
+    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
 
-    [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+    [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] \
+    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
 }
 
 ##############################

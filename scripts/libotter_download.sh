@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # include libotter lib
-source ./libotter_lib.sh
+source ./scripts/libotter_lib.sh
+
+# include docker lib
+source ./scripts/libotter_docker.sh
 
 # 文件名：/otter/otter/files/bin/docker/x86_64/docker-20.10.24.tgz
 # https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/aarch64/docker-20.10.24.tgz
@@ -169,7 +172,81 @@ function download_helm_binary_file(){
     fi
 }
 
-download_docker_binary_file /root/otter /root/otter/config/otter.yaml
+# todo: need to do it
+function download_etcd_binary_file(){
+    echo "1"
+}
+
+############################
+# Pull image
+# Argument:
+#   $1 - image_location
+#   $2 - image arch
+#   $3 - image save to dest
+# Return:
+#   None
+function pull_save_delete_image(){
+    local image_location=${1:?image_location missing}
+    local image_arch=${2:?image_arch missing}
+    local image_save_to_dest=${3:?image_save_to_dest missing}
+
+    # check image exist and check arch
+    logger info "$image_location $image_arch start pull"
+    if docker image ls | awk -v OFS=: 'NR>1{print $1,$2}' | grep $otter_image_location &>/dev/null ; then
+        if [[ $image_arch = "linux/arm64" ]]; then
+            if ! docker inspect $otter_image_location | grep "arm64" &>/dev/null ; then
+                # pull image
+                docker pull $image_location --platform $image_arch &>/dev/null \
+                && logger info "$image_location $image_arch pull success" \
+                || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+            fi
+        fi
+        if [[ $image_arch = "linux/amd64" ]]; then
+            if ! docker inspect $otter_image_location | grep "amd64" &>/dev/null ; then
+                docker pull $image_location --platform $image_arch &>/dev/null \
+                && logger info "$image_location $image_arch pull success" \
+                || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+            fi
+        fi
+    else
+        docker pull $image_location --platform $image_arch &>/dev/null \
+        && logger info "$image_location $image_arch pull success" \
+        || { logger error "$image_location $image_arch pull failed"; exit 1; }      
+    fi
+
+    # save image
+    logger info "$image_location $image_arch start save to $image_save_to_dest"
+    docker save $image_location > $image_save_to_dest &>/dev/null \
+    && logger info "$image_location $image_arch save to $image_save_to_dest success" \
+    || { logger error "$image_location $image_arch save to $image_save_to_dest failed"; exit 1; }
+
+    # rmi image
+    logger info "$image_location $image_arch image start delete"
+    docker rmi -f $image_location &>/dev/null \
+    && logger info "$image_location $image_arch image delete success" \
+    || { logger error "$image_location $image_arch delete failed"; exit 1 ; }
+}
+
+function download_otter_image(){
+    local otter_base_dir=${1:?otter_base_dir missing}
+    local otter_config_file=${2:?otter_config_file missing}
+
+    local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $otter_config_file)
+    local otter_image_location=$(get_config OTTER_IMAGE $otter_config_file)
+    local os_architecture=$(arch)
+
+    [[ $otter_mixed_enable = true ]] \
+    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar \
+    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+
+    [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] \
+    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
+
+    [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] \
+    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+}
+
+#download_docker_binary_file /root/otter /root/otter/config/otter.yaml
 #download_kubernetes_node_binary_file /root/otter /root/otter/config/otter.yaml
 #download_cni_plugin_binary_file /root/otter /root/otter/config/otter.yaml
 #download_helm_binary_file /root/otter /root/otter/config/otter.yaml

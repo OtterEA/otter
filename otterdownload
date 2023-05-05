@@ -5,7 +5,7 @@ BASE_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) &>/dev/null && pwd)
 CONFIG_FILE=$BASE_DIR/config/otter.yaml
 
 # include lib
-source $BASE_DIR/scripts/libotter.sh
+source $BASE_DIR/scripts/libotter_lib.sh
 
 # include download resource lib
 source $BASE_DIR/scripts/libotter_download.sh
@@ -25,3 +25,34 @@ logo
 function usage(){
     echo 1
 }
+
+case $1 in
+"download_all")
+    echo 1
+;;
+"download_docker")
+    echo 1
+;;
+"download_kubernetes_node")
+    echo 1
+;;
+"download_cni_plugin")
+    echo 1
+;;
+"download_k9s")
+    echo 1
+;;
+"download_helm")
+    echo 1
+;;
+"download_otter_image")
+    install_with_start_docker $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
+    download_otter_image $BASE_DIR $CONFIG_FILE
+;;
+"download_kubernetes_image")
+    echo 1
+;;
+*)
+    usage
+;;
+esac

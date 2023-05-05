@@ -1,7 +1,10 @@
 #!/bin/bash
+################################################################
+# author: qujiayu98@163.com
+################################################################
 
 # include otter lib
-source ./libotter_lib.sh
+source ./scripts/libotter_lib.sh
 
 #############################
 # Generate Docker Configuration
@@ -126,94 +129,40 @@ function delete_container_docker(){
 #   None
 # Return:
 #   None
-function start_docker(){
-    { systemctl daemon-reload && systemctl start docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
-}
-
-############################# 
-# Install Docker
-# Argument:
-#   $1 - otter_base_dir
-#   $2 - otter_config_file 
-#   $3 - otter_harbor_config_file
-# Return:
-#   None
-function install_docker(){
+function install_with_start_docker(){
     local otter_base_dir=${1:?otter_base_dir missing}
     local otter_config_file=${2:?otter config file missing}
     local otter_harbor_config_file=${3:?otter harbor config file missing}
+    local docker_version=$(get_config DOCKER_VERSION $otter_config_file)
 
-    decompress_docker_binary_file $otter_base_dir $otter_config_file
-    generate_docker_configuration $otter_config_file $otter_harbor_config_file
-    start_docker
-}
+    function start_docker(){
+        local force=${1:?force missing}
+        if [[ $force = true ]]; then
+            { systemctl daemon-reload && systemctl start docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
+        else
+            if ! systemctl is-active docker &>/dev/null ; then
+                { systemctl daemon-reload && systemctl start docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
+            else
+                logger info "docker has already started"
+            fi
+        fi
+    }
 
-############################
-# Pull image
-# Argument:
-#   $1 - image_location
-#   $2 - image arch
-#   $3 - image save to dest
-# Return:
-#   None
-function pull_save_delete_image(){
-    local image_location=${1:?image_location missing}
-    local image_arch=${2:?image_arch missing}
-    local image_save_to_dest=${3:?image_save_to_dest missing}
-
-    # check image exist and check arch
-
-    # pull image
-    docker pull $image_location --platform $image_arch &>/dev/null \
-    && logger info "$image_location $image_arch pull success" \
-    || { logger error "$image_location $image_arch pull failed"; exit 1; } 
-
-    # save image
-    docker save $image_location > $image_save_to_dest &>/dev/null \
-    && logger info "$image_location save to $image_save_to_dest success" \
-    || { logger error "$image_location save to $image_save_to_dest failed"; exit 1; }
-
-    # rmi image
-    docker rmi -f $image_location &>/dev/null
-    && logger info "$image_location delete success ok" \
-    || { logger error "$image_location delete failed"; exit 1 ; }
-}
-
-###########################
-# Pull otter image
-# Argument:
-#   $1 - otter_base_dir
-#   $2 - otter config file
-# Return:
-#   None
-function pull_otter_image(){
-    local otter_base_dir=${1:?otter_base_dir missing}
-    local otter_config_file=${2:?otter_config_file missing}
-
-    local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $otter_config_file)
-    local otter_image_location=$(get_config OTTER_IMAGE $otter_config_file)
-
-    local os_architecture=$(arch)
-
-    [[ $otter_mixed_enable = true ]] \
-    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar \
-    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
-
-    [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] \
-    && pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
-
-    [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] \
-    && pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
-}
-
-##############################
-# pull kubernetes image
-# Argument:
-#   None
-# Return:
-#   None
-function pull_kubernetes_image(){
-    echo 1
+    # check docker version if has already exist,if version not right install it
+    if command_exist docker ; then
+        if ! docker version | grep -q $docker_version ; then
+            decompress_docker_binary_file $otter_base_dir $otter_config_file
+            generate_docker_configuration $otter_config_file $otter_harbor_config_file
+            start_docker true
+            return
+        fi
+    else
+            decompress_docker_binary_file $otter_base_dir $otter_config_file
+            generate_docker_configuration $otter_config_file $otter_harbor_config_file
+            start_docker true
+            return
+    fi
+    start_docker false
 }
 
 
@@ -222,26 +171,55 @@ function pull_kubernetes_image(){
 # Argument:
 #   $1 - otter_base_dir
 #   $2 - otter_config_file
-#   $3 - otter_harbor_config_file   
 # Return:
 #   None
 function start_otter_container(){
     local otter_base_dir=${1:?otter_base_dir missing}
     local otter_config_file=${2:?otter_config_file missing}
-    local otter_harbor_config_file=${3:?otter_harbor_config_file missing}
+    local otter_harbor_config_file=${3:?otter harbor config file missing}
 
     local otter_image_location=$(get_config OTTER_IMAGE $otter_config_file)
     local os_architecture=$(arch)
-    # install docker
-    install_docker $otter_base_dir $otter_config_file $otter_harbor_config_file
 
-    # todo: otter image will be delete if it run
-    # pull otter image
-    pull_otter_image $otter_base_dir $otter_config_file
+    # install or start docker
+    install_with_start_docker $otter_base_dir $otter_config_file $otter_harbor_config_file
+
+    # rm otter running container
+    #docker ps -a | grep otter | awk '{ print $1}' | xargs docker rm &>/dev/null && logger info "otter running container delete success"
 
     # check image and load it
-    docker image ls | awk -v OFS=: 'NR>1{print $1,$2}' | grep $otter_image_location \
-    || docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar
+    if docker image ls | awk -v OFS=: 'NR>1{print $1,$2}' | grep $otter_image_location &>/dev/null ; then
+        if [[ $os_architecture = "aarch64" ]]; then
+            if docker inspect $otter_image_location | grep "arm64" &>/dev/null ; then
+                logger info "$otter_image_location $os_architecture has already exist"
+            else
+                docker rmi $otter_image_location &>/dev/null
+                [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
+                && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
+
+                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+                || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
+            fi
+        fi
+        if [[ $os_architecture = "x86_64" ]]; then
+            if docker inspect $otter_image_location | grep "amd64" &>/dev/null ; then
+                logger info "$otter_image_location $os_architecture has already exist"
+            else
+                docker rmi $otter_image_location &>/dev/null
+                [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
+                && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
+
+                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+                || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
+            fi
+        fi
+    else
+        [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
+        && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
+
+        docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+        || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
+    fi
 
     # run otter container
     docker ps -a | grep otter | grep -i Exited | awk '{ print $1}' | xargs docker rm &>/dev/null
@@ -259,4 +237,15 @@ function start_otter_container(){
     fi
 }
 
-start_otter_container /root/otter /root/otter/config/otter.yaml /root/otter/config/middleware/harbor.yaml
+#start_otter_container /root/otter /root/otter/config/otter.yaml
+
+##############################
+# pull kubernetes image
+# Argument:
+#   None
+# Return:
+#   None
+function pull_kubernetes_image(){
+    echo 1
+}
+

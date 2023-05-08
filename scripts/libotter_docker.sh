@@ -197,7 +197,7 @@ function start_otter_container(){
                 [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
                 && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
 
-                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar &>/dev/null \
                 || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
             fi
         fi
@@ -209,7 +209,7 @@ function start_otter_container(){
                 [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
                 && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
 
-                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+                docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar &>/dev/null \
                 || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
             fi
         fi
@@ -217,7 +217,7 @@ function start_otter_container(){
         [[ ! -f $otter_base_dir/files/images/otter/$os_architecture/otter.tar ]] \
         && { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar not exist,please run otter_download"; exit 1 ; }
 
-        docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar \
+        docker load -i $otter_base_dir/files/images/otter/$os_architecture/otter.tar &>/dev/null \
         || { logger error "$otter_base_dir/files/images/otter/$os_architecture/otter.tar load failed"; exit 1; }
     fi
 

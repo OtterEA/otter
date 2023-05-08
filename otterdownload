@@ -28,29 +28,40 @@ function usage(){
 
 case $1 in
 "download_all")
-    echo 1
+    # download binary files
+    download_docker_binary_file $BASE_DIR $CONFIG_FILE
+    download_kubernetes_node_binary_file $BASE_DIR $CONFIG_FILE
+    download_cni_plugin_binary_file $BASE_DIR $CONFIG_FILE
+    download_k9s_binary_file $BASE_DIR $CONFIG_FILE
+    download_helm_binary_file $BASE_DIR $CONFIG_FILE
+
+    # install dockr and start it
+    install_with_start_docker $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
+
+    # now download images
+    download_otter_image $BASE_DIR $CONFIG_FILE
 ;;
 "download_docker")
-    echo 1
+    download_docker_binary_file
 ;;
 "download_kubernetes_node")
-    echo 1
+    download_kubernetes_node_binary_file
 ;;
 "download_cni_plugin")
-    echo 1
+    download_cni_plugin_binary_file
 ;;
 "download_k9s")
-    echo 1
+    download_k9s_binary_file
 ;;
 "download_helm")
-    echo 1
+    download_helm_binary_file
 ;;
 "download_otter_image")
     install_with_start_docker $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
     download_otter_image $BASE_DIR $CONFIG_FILE
 ;;
 "download_kubernetes_image")
-    echo 1
+    download_kubernetes_image $BASE_DIR $CONFIG_FILE
 ;;
 *)
     usage

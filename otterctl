@@ -8,3 +8,19 @@ source $BASE_DIR/scripts/libotter.sh
 
 # print logo 
 logo
+
+function otterctl_useage(){
+    echo 1
+}
+
+case $1 in
+"start")
+    otterctl_useage
+;;
+"stop")
+    otterctl_useage
+;;
+*)
+    otterctl_useage
+;;
+esac

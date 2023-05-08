@@ -40,11 +40,6 @@ function scpSSHKeyToNode(){
     local node_ssh_port=${2:?node ssh port missing}
     local node_ssh_password=${3:?node ssh password missing}
 
-    if ! docker ps | grep otter &>/dev/null ; then
-        # todo: need to start otter
-        echo 1
-    fi
-
     docker exec otter sshpass -p $node_ssh_password scp -P $node_ssh_port \
         -o ConnectTimeout=1 -o ConnectionAttempts=3 -o StrictHostKeyChecking=no -o 'UserKnownHostsFile /dev/null' root@$node_ip "mkdir -p /root/.ssh" &>/dev/null && \
     docker exec otter sshpass -p $node_ssh_password scp -P $node_ssh_port \ 

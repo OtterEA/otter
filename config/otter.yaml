@@ -97,7 +97,7 @@ KUBERNETES_BOOTSTRAP_TOKEN: 9a08jv.c0izixklcxtmnze7
 # kubeadm 加密证书和密钥的密钥(主要用于控制平面加入集群时使用),永久生效
 KUBERNETES_CERTIFICATE_KEY: 5333dd1e432c9a3563870608bea3e412d664040d891492aa6fb1c47d95cefe6c
 
-# 国内K8S镜像源地址
+# 国内K8S镜像源地址,末尾请不要加斜杠
 KUBERNETES_IMAGE_REPO: registry.cn-hangzhou.aliyuncs.com/google_containers
 
 ##################### 各类中间件是否启用开关(具体配置请去/config/middleware/下面配置)  #############################

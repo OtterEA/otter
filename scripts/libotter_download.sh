@@ -185,53 +185,63 @@ function download_etcd_binary_file(){
 #   $3 - image save to dest
 # Return:
 #   None
-function docker_pull_save_delete_image(){
-    local image_location=${1:?image_location missing}
+function docker_pull_save_delete_images(){
+    #local image_location=${1:?image_location missing}
+    #local image_arch=${2:?image_arch missing}
+    #local image_save_to_dest=${3:?image_save_to_dest missing}
+
+    local image_location_list=${1:?image_location missing}
     local image_arch=${2:?image_arch missing}
-    local image_save_to_dest=${3:?image_save_to_dest missing}
+    local image_localtion_list_save_to_dest=${3:?image_location_list save to dest missing}
 
-    # check image exist and check arch
-    logger info "$image_location $image_arch start pull"
-    if docker image ls | awk -v OFS=: 'NR>1{print $1,$2}' | grep $otter_image_location &>/dev/null ; then
-        if [[ $image_arch = "linux/arm64" ]]; then
-            if ! docker inspect $otter_image_location | grep "arm64" &>/dev/null ; then
-                # image arch not correct, so delete it avoid image none situation
-                docker rmi $image_location &>/dev/null
+    for image_location in ${image_location_list[*]} ; do
+        # check image exist and check arch
+        logger info "$image_location $image_arch start pull"
+        if docker image ls | awk -v OFS=: 'NR>1{print $1,$2}' | grep $otter_image_location &>/dev/null ; then
+            if [[ $image_arch = "linux/arm64" ]]; then
+                if ! docker inspect $otter_image_location | grep "arm64" &>/dev/null ; then
+                    # image arch not correct, so delete it avoid image none situation
+                    docker rmi $image_location &>/dev/null
 
-                # pull image
-                docker pull $image_location --platform $image_arch &>/dev/null \
-                && logger info "$image_location $image_arch pull success" \
-                || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+                    # pull image
+                    docker pull $image_location --platform $image_arch &>/dev/null \
+                    && logger info "$image_location $image_arch pull success" \
+                    || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+                fi
             fi
-        fi
-        if [[ $image_arch = "linux/amd64" ]]; then
-            if ! docker inspect $otter_image_location | grep "amd64" &>/dev/null ; then
-                # image arch not correct, so delete it avoid image none situation
-                docker rmi $image_location &>/dev/null
+            if [[ $image_arch = "linux/amd64" ]]; then
+                if ! docker inspect $otter_image_location | grep "amd64" &>/dev/null ; then
+                    # image arch not correct, so delete it avoid image none situation
+                    docker rmi $image_location &>/dev/null
                 
-                # pull image
-                docker pull $image_location --platform $image_arch &>/dev/null \
-                && logger info "$image_location $image_arch pull success" \
-                || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+                    # pull image
+                    docker pull $image_location --platform $image_arch &>/dev/null \
+                    && logger info "$image_location $image_arch pull success" \
+                    || { logger error "$image_location $image_arch pull failed"; exit 1; } 
+                fi
             fi
+        else
+            docker pull $image_location --platform $image_arch &>/dev/null \
+            && logger info "$image_location $image_arch pull success" \
+            || { logger error "$image_location $image_arch pull failed"; exit 1; }      
         fi
-    else
-        docker pull $image_location --platform $image_arch &>/dev/null \
-        && logger info "$image_location $image_arch pull success" \
-        || { logger error "$image_location $image_arch pull failed"; exit 1; }      
-    fi
+    done
 
     # save image
-    logger info "$image_location $image_arch start save to $image_save_to_dest"
-    docker save $image_location > $image_save_to_dest &>/dev/null \
-    && logger info "$image_location $image_arch save to $image_save_to_dest success" \
-    || { logger error "$image_location $image_arch save to $image_save_to_dest failed"; exit 1; }
+    #for image_location in ${image_location_list[*]}; do
+    #    logger info "$image_location $image_arch start save to $image_localtion_list_save_to_dest"
+    #done
+    docker save ${image_location_list[@]} > $image_localtion_list_save_to_dest &>/dev/null \
+    && logger info "${image_location_list[@]} $image_arch save to $image_save_to_dest success" \
+    || { logger error "${image_location_list[@]} $image_arch save to $image_save_to_dest failed"; exit 1; }
 
     # rmi image
-    logger info "$image_location $image_arch image start delete"
-    docker rmi -f $image_location &>/dev/null \
-    && logger info "$image_location $image_arch image delete success" \
-    || { logger error "$image_location $image_arch delete failed"; exit 1 ; }
+    #for image_location in ${image_location_list[*]}; do
+    #    logger info "$image_location $image_arch image start delete"
+    #done
+    docker rmi -f ${image_location_list[@]} &>/dev/null \
+    && logger info "${image_location_list[@]} $image_arch image delete success" \
+    || { logger error "${image_location_list[@]} $image_arch delete failed"; exit 1 ; }
 }
 
 function download_otter_image(){
@@ -243,25 +253,30 @@ function download_otter_image(){
     local os_architecture=$(arch)
 
     [[ $otter_mixed_enable = true ]] \
-    && docker_pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar \
-    && docker_pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+    && docker_pull_save_delete_images $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar \
+    && docker_pull_save_delete_images $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
 
     [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] \
-    && docker_pull_save_delete_image $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
+    && docker_pull_save_delete_images $otter_image_location "linux/amd64" $otter_base_dir/files/images/otter/x86_64/otter.tar 
 
     [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] \
-    && docker_pull_save_delete_image $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
+    && docker_pull_save_delete_images $otter_image_location "linux/arm64" $otter_base_dir/files/images/otter/aarch64/otter.tar
 }
+#single=registry.c2cloud.cn/k8s/pause:3.2
+#multi=(registry.c2cloud.cn/k8s/pause:3.2 registry.c2cloud.cn/k8s/pause:3.3)
+#docker_pull_save_delete_images $single linux/amd64 /tmp/k8s-pause.tar
+#docker_pull_save_delete_images "${multi[*]}" linux/amd64 /tmp/k8s-pause.tar
 
 function download_kubernetes_image(){
     local otter_base_dir=${1:?otter_base_dir missing}
     local otter_config_file=${2:?otter_config_file missing}
 
+    local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $otter_config_file)
     local k8s_version=$(get_config KUBERNETES_VERSION $otter_config_file)
     local k8s_image_repo=$(get_config KUBERNETES_IMAGE_REPO $otter_config_file)
     local os_architecture=$(arch)
 
-    # check kubeadm command exist
+    # check kubeadm command exist, and pull kubernetes images
     if command_exist kubeadm ; then
         # check kubeadm version,but version is not correct
         if ! kubeadm --version | grep $k8s_version &>/dev/null ; then
@@ -269,7 +284,7 @@ function download_kubernetes_image(){
             [[ ! -f $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz ]] \
             && { logger error "$otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz is not exist,please download resource"; exit 1; }
 
-            [[ ! -f /tmp/otter/kubernetes ]] && { logger info "/tmp/otter/kubernetes not exist,will create it for kubeadm command"; mkdir -p /tmp/otter/kubernetes; }
+            [[ ! -d /tmp/otter/kubernetes/ ]] && { logger info "/tmp/otter/kubernetes not exist,will create it for kubeadm command"; mkdir -p /tmp/otter/kubernetes; }
 
             tar -zxf $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz -C /tmp/otter/ &>/dev/null \
             && logger info "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes success" \
@@ -286,7 +301,7 @@ function download_kubernetes_image(){
         [[ ! -f $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz ]] \
         && { logger error "$otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz is not exist,please download resource"; exit 1; }
 
-        [[ ! -f /tmp/otter/kubernetes ]] && { logger info "/tmp/otter/kubernetes not exist,will create it for kubeadm command"; mkdir -p /tmp/otter/kubernetes; }
+        [[ ! -d /tmp/otter/kubernetes ]] && { logger info "/tmp/otter/kubernetes not exist,will create it for kubeadm command"; mkdir -p /tmp/otter/kubernetes; }
 
         tar -zxf $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz -C /tmp/otter/ &>/dev/null \
         && logger info "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes success" \
@@ -294,7 +309,22 @@ function download_kubernetes_image(){
 
         local k8s_image_list=($(/tmp/otter/kubernetes/node/bin/kubeadm config images list 2>/dev/null | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g")) 
     fi
-    echo ${k8s_image_list[@]}
+
+    # pull flannel images
+    # pull metrics images
+    # pull dashboard images
+
+    # download k8s image,must use k8s_image_list[*] not k8s_image_list[@]
+    [[ $otter_mixed_enable = true ]] \
+    && docker_pull_save_delete_images "${k8s_image_list[*]}" "linux/arm64" $otter_base_dir/files/images/k8s/aarch64/kubernetes.tar \
+    && docker_pull_save_delete_images "${k8s_image_list[*]}" "linux/amd64" $otter_base_dir/files/images/k8s/x86_64/kubernetes.tar 
+
+    [[ $otter_mixed_enable == false && $os_architecture == "x86_64" ]] \
+    && docker_pull_save_delete_images "${k8s_image_list[*]}" "linux/amd64" $otter_base_dir/files/images/k8s/x86_64/kubernetes.tar 
+
+    [[ $otter_mixed_enable == false && $os_architecture == "aarch64" ]] \
+    && docker_pull_save_delete_images "${k8s_image_list[*]}" "linux/arm64" $otter_base_dir/files/images/k8s/aarch64/kubernetes.tar
+
 }
 
 #download_docker_binary_file /root/otter /root/otter/config/otter.yaml

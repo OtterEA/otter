@@ -40,6 +40,7 @@ case $1 in
 
     # now download images
     download_otter_image $BASE_DIR $CONFIG_FILE
+    download_kubernetes_image $BASE_DIR $CONFIG_FILE
 ;;
 "download_docker")
     download_docker_binary_file

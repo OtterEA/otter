@@ -228,17 +228,11 @@ function docker_pull_save_delete_images(){
     done
 
     # save image
-    #for image_location in ${image_location_list[*]}; do
-    #    logger info "$image_location $image_arch start save to $image_localtion_list_save_to_dest"
-    #done
-    docker save ${image_location_list[@]} > $image_localtion_list_save_to_dest &>/dev/null \
-    && logger info "${image_location_list[@]} $image_arch save to $image_save_to_dest success" \
-    || { logger error "${image_location_list[@]} $image_arch save to $image_save_to_dest failed"; exit 1; }
+    docker save ${image_location_list[@]} > $image_localtion_list_save_to_dest \
+    && logger info "${image_location_list[@]} $image_arch save to $image_localtion_list_save_to_dest success" \
+    || { logger error "${image_location_list[@]} $image_arch save to $image_localtion_list_save_to_dest failed"; exit 1; }
 
     # rmi image
-    #for image_location in ${image_location_list[*]}; do
-    #    logger info "$image_location $image_arch image start delete"
-    #done
     docker rmi -f ${image_location_list[@]} &>/dev/null \
     && logger info "${image_location_list[@]} $image_arch image delete success" \
     || { logger error "${image_location_list[@]} $image_arch delete failed"; exit 1 ; }

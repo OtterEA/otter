@@ -4,7 +4,10 @@ BASE_DIR=$(cd $(dirname ${BASH_SOURCE[0]}) &>/dev/null && pwd)
 CONFIG_FILE=$BASE_DIR/config/otter.yaml
 
 # include lib
-source $BASE_DIR/scripts/libotter.sh
+source $BASE_DIR/scripts/libotter_lib.sh
+
+# include docker
+source $BASE_DIR/scripts/libotter_docker.sh
 
 # print logo 
 logo
@@ -15,7 +18,14 @@ function otterctl_useage(){
 
 case $1 in
 "start")
-    otterctl_useage
+    case $2 in
+    "otter")
+        start_otter_container $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
+    ;;
+    *)
+        otterctl_useage
+    ;;
+    esac
 ;;
 "stop")
     otterctl_useage

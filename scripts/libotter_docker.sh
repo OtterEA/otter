@@ -238,14 +238,3 @@ function start_otter_container(){
 }
 
 #start_otter_container /root/otter /root/otter/config/otter.yaml
-
-##############################
-# pull kubernetes image
-# Argument:
-#   None
-# Return:
-#   None
-function pull_kubernetes_image(){
-    echo 1
-}
-

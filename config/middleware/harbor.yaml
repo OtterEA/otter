@@ -1,7 +1,7 @@
 ################################ Harbor 配置  ####################################
 # Harbor 域名,如果没有域名需求默认即可,方式方式https://harbor_domian
 # 即使不启用Harbor，所有节点的镜像坐标将会是以Harbor Domain 为基准(无论在线还是离线)
-HARBOR_DOMAIN: otter.com
+HARBOR_DOMAIN: registry.otter.local
 
 # HARBOR 部署节点IP，该IP必须要是K8S集群内
 HARBOR_IP: 127.0.0.1

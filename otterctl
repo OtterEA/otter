@@ -9,6 +9,9 @@ source $BASE_DIR/scripts/libotter_lib.sh
 # include docker
 source $BASE_DIR/scripts/libotter_docker.sh
 
+# include ssh lib
+source $BASE_DIR/scripts/libotter_ssh.sh
+
 # print logo 
 logo
 
@@ -16,11 +19,56 @@ function otterctl_useage(){
     echo 1
 }
 
+function start_otter(){
+    start_otter_container $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
+}
+
+function start_copy_ssh_key(){
+    # generate ssh key
+    generateSSHKey
+
+    # get all node ip
+    local node_ip_list=(`grep -oE "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}" $BASE_DIR/config/otter.ini | sort -ru`)
+    echo -ne "\033[33m[ INPUT ROOT PASSWORD ]\033[0m : "
+    read node_root_password
+
+    echo -ne "\033[33m[ INPUT SSH PORT ]\033[0m : "
+    read node_ssh_port
+
+    # validate node_ip
+    for ip in ${node_ip_list[@]} ; do
+        if ! validate_ipv4 ip ; then
+            logger error "$ip not correct"
+            exit 1
+        fi
+    done
+
+    # copy ssh key to another node
+    for ip in ${node_ip_list[@]}; do
+        scpSSHKeyToNode $ip $node_ssh_port $node_root_password
+    done
+}
+
+function install_kubernetes(){
+    echo 1
+}
+
+function install_harbor(){
+    echo 1
+}
+
+function install_monitor(){
+    echo 1
+}
+
 case $1 in
 "start")
     case $2 in
     "otter")
-        start_otter_container $BASE_DIR $CONFIG_FILE $BASE_DIR/config/middleware/harbor.yaml
+        start_otter
+    ;;
+    "copy_ssh_key")
+        start_copy_ssh_key
     ;;
     *)
         otterctl_useage
@@ -29,7 +77,14 @@ case $1 in
 ;;
 "install")
     case $2 in 
-    "all")
+    "kubernetes")
+        install_kubernetes
+    ;;
+    "harbor")
+        otterctl_useage
+    ;;
+    "monitor")
+        otterctl_useage
     ;;
     *)
         otterctl_useage

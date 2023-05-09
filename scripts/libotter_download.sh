@@ -186,14 +186,17 @@ function download_etcd_binary_file(){
 # Return:
 #   None
 function docker_pull_save_delete_images(){
-    #local image_location=${1:?image_location missing}
-    #local image_arch=${2:?image_arch missing}
-    #local image_save_to_dest=${3:?image_save_to_dest missing}
-
+    # image_location_list must be consist of domain/project/image_name:tag
     local image_location_list=${1:?image_location missing}
     local image_arch=${2:?image_arch missing}
     local image_localtion_list_save_to_dest=${3:?image_location_list save to dest missing}
 
+    # todo: validate image
+    function validate_image(){
+        echo 1
+    }
+
+    # pull images from image_location list
     for image_location in ${image_location_list[*]} ; do
         # check image exist and check arch
         logger info "$image_location $image_arch start pull"
@@ -226,6 +229,8 @@ function docker_pull_save_delete_images(){
             || { logger error "$image_location $image_arch pull failed"; exit 1; }      
         fi
     done
+
+    # image tag for offline to ansible, there will not do it
 
     # save image
     docker save ${image_location_list[@]} > $image_localtion_list_save_to_dest \
@@ -261,6 +266,7 @@ function download_otter_image(){
 #docker_pull_save_delete_images $single linux/amd64 /tmp/k8s-pause.tar
 #docker_pull_save_delete_images "${multi[*]}" linux/amd64 /tmp/k8s-pause.tar
 
+#todo: need to check bc command
 function download_kubernetes_image(){
     local otter_base_dir=${1:?otter_base_dir missing}
     local otter_config_file=${2:?otter_config_file missing}
@@ -305,8 +311,17 @@ function download_kubernetes_image(){
     fi
 
     # pull flannel images
+    if [[ $(echo "${k8s_version%.*} >= 1.25" | bc ) -eq 1 ]]; then
+        k8s_image_list=(${k8s_image_list[@]} $(get_config k8s-flannel-cni-plugin-v0.21.4 $otter_config_file) $(get_config k8s-flannel-v0.21.4 $otter_config_file))
+    else
+        k8s_image_list=(${k8s_image_list[@]} $(get_config k8s-flannel-cni-plugin-v0.18.1 $otter_config_file) $(get_config k8s-flannel-v0.18.1 $otter_config_file))
+    fi
+
     # pull metrics images
+    k8s_image_list=(${k8s_image_list[@]} $(get_config k8s-metrics-server $otter_config_file))
+
     # pull dashboard images
+    k8s_image_list=(${k8s_image_list[@]} $(get_config k8s-dashboard $otter_config_file) $(get_config k8s-dashboard-metrics-scraper $otter_config_file))
 
     # download k8s image,must use k8s_image_list[*] not k8s_image_list[@]
     [[ $otter_mixed_enable = true ]] \

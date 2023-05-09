@@ -121,8 +121,8 @@ function get_config(){
     local key=${1:?key missing}
     local config_file=${2:?config file missing}
 
-    if grep -q -E "^${key}:.*$" $config_file ; then
-        grep -E "^${key}:.*$" $config_file | awk '{ print $2 }'
+    if grep -q -E "\s*${key}:.*$" $config_file ; then
+        grep -E "\s*${key}:.*$" $config_file | awk '{ print $2 }'
     fi
 }
 #echo $(get_config SERVICE_CIDR ../config/otter.yaml)

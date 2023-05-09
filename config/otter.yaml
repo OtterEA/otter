@@ -125,14 +125,14 @@ OTTER_IMAGE: jiayu98/otter:v0.1
 
 # k8s镜像坐标
 K8S_IMAGE:
-  # 适用于k8s <= 1.25
-  k8s-flannel-v0.18.1:
-    k8s-flannel-cni-plugin-v0.18.1: docker.io/flannelcni/flannel-cni-plugin:v1.1.0
-    k8s-flannel-v0.18.1: docker.io/flannelcni/flannel:v0.18.1
   # 适用于k8s >= 1.25
   k8s-flannel-v0.21.4:
     k8s-flannel-cni-plugin-v0.21.4: docker.io/flannel/flannel-cni-plugin:v1.1.2
     k8s-flannel-v0.21.4: docker.io/flannel/flannel:v0.21.4
+  # 适用于k8s <= 1.25
+  k8s-flannel-v0.18.1:
+    k8s-flannel-cni-plugin-v0.18.1: docker.io/flannelcni/flannel-cni-plugin:v1.1.0
+    k8s-flannel-v0.18.1: docker.io/flannelcni/flannel:v0.18.1
   # k8s dashboard镜像
   k8s-dashboard: docker.io/kubernetesui/dashboard:v2.7.0
   k8s-dashboard-metrics-scraper: docker.io/kubernetesui/metrics-scraper:v1.0.8

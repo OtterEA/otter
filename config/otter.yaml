@@ -74,7 +74,7 @@ KUBERNETES_DASHBOARD_ENABLE: true
 KUBERNETES_DSCHEDULE_ENABLE: false
 
 # 是否启用K8S节点压力保护
-KUBERNETES_PRESSURE_PROTECTION_ENABLE: true
+KUBERNETES_PRESSURE_PROTECTION_ENABLE: false
 
 # 是否启用k8s kube-reserved保护,如需要就开启,部分系统存在兼容性问题
 # 部分系统开启后可能会出现:Failed to start ContainerManager Failed to enforce Kube Reserved Cgroup Limits on "/kubelet.slice": ["kubelet"] cgroup does not exist
@@ -87,22 +87,22 @@ KUBERNETES_SYSTEMD_RESERVED_ENABLE: false
 # K8S 是否启用双栈网络(IPV4/IPV6),暂时未适配
 KUBERNETES_DUAL_STACK_ENABLE: false
 
-# k8s init token(设置默认的bootstrap token),永久生效
+# k8s init token(设置默认的bootstrap token),永久生效,默认即可
 # 生成方式：head -c 16 /dev/urandom | od -An -t x | tr -d ' '
 KUBERNETES_APISERVER_AUTH_TOKEN: 2ee257d1ebf19c8f387a28d84b5e5987
 
-# 默认生成bootstrap token，永久生效
+# 默认生成bootstrap token，永久生效,默认即可
 KUBERNETES_BOOTSTRAP_TOKEN: 9a08jv.c0izixklcxtmnze7
 
-# kubeadm 加密证书和密钥的密钥(主要用于控制平面加入集群时使用),永久生效
+# kubeadm 加密证书和密钥的密钥(主要用于控制平面加入集群时使用),永久生效,默认即可
 KUBERNETES_CERTIFICATE_KEY: 5333dd1e432c9a3563870608bea3e412d664040d891492aa6fb1c47d95cefe6c
 
-# 国内K8S镜像源地址,末尾请不要加斜杠
+# 国内K8S镜像源地址,末尾请不要加斜杠,离线下载镜像资源时，会在这里下载k8s相关镜像资源
 KUBERNETES_IMAGE_REPO: registry.cn-hangzhou.aliyuncs.com/google_containers
 
 ##################### 各类中间件是否启用开关(具体配置请去/config/middleware/下面配置)  #############################
 # 是否部署HARBOR，HARBOR部署方式为Chart部署,我们默认推荐部署
-# 如果不部署Harbor，K8S镜像将用阿里云初始化
+# 如果不部署Harbor，K8S镜像将用阿里云初始化,如果部署harbor整个集群的镜像坐标将会以这个Harbor为准
 HARBOR_ENABLE: false
 
 # 是否部署监控
@@ -124,12 +124,17 @@ K9S_VERSION: 0.27.3
 OTTER_IMAGE: jiayu98/otter:v0.1
 
 # k8s镜像坐标
-K8S:
+K8S_IMAGE:
   # 适用于k8s <= 1.25
   k8s-flannel-v0.18.1:
-    k8s-flannel-cni-plugin-v0.18.1: flannelcni/flannel-cni-plugin:v1.1.0
-    k8s-flannel-v0.18.1: flannelcni/flannel:v0.18.1
+    k8s-flannel-cni-plugin-v0.18.1: docker.io/flannelcni/flannel-cni-plugin:v1.1.0
+    k8s-flannel-v0.18.1: docker.io/flannelcni/flannel:v0.18.1
   # 适用于k8s >= 1.25
   k8s-flannel-v0.21.4:
-    k8s-flannel-cni-plugin-v0.21.4: flannel/flannel-cni-plugin:v1.1.2
-    k8s-flannel-v0.21.4: flannel/flannel:v0.21.4
+    k8s-flannel-cni-plugin-v0.21.4: docker.io/flannel/flannel-cni-plugin:v1.1.2
+    k8s-flannel-v0.21.4: docker.io/flannel/flannel:v0.21.4
+  # k8s dashboard镜像
+  k8s-dashboard: docker.io/kubernetesui/dashboard:v2.7.0
+  k8s-dashboard-metrics-scraper: docker.io/kubernetesui/metrics-scraper:v1.0.8
+  # k8s metrics-server镜像
+  k8s-metrics-server: docker.io/bitnami/metrics-server:0.6.3

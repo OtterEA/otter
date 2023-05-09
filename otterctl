@@ -27,6 +27,15 @@ case $1 in
     ;;
     esac
 ;;
+"install")
+    case $2 in 
+    "all")
+    ;;
+    *)
+        otterctl_useage
+    ;;
+    esac
+;;
 "stop")
     otterctl_useage
 ;;

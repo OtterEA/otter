@@ -138,10 +138,10 @@ function install_with_start_docker(){
     function start_docker(){
         local force=${1:?force missing}
         if [[ $force = true ]]; then
-            { systemctl daemon-reload && systemctl start docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
+            { systemctl daemon-reload && systemctl enable docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
         else
             if ! systemctl is-active docker &>/dev/null ; then
-                { systemctl daemon-reload && systemctl start docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
+                { systemctl daemon-reload && systemctl enable docker --now; } && logger info "docker start success" || { logger error "docker start failed"; exit 1; }
             else
                 logger info "docker has already started"
             fi

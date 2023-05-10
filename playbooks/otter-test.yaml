@@ -1,6 +1,10 @@
 - hosts:
   - kubernetes_master
   ignore_unreachable: false
+  vars_files:
+  - ../config/otter.yaml
+  - ../config/middleware/harbor.yaml
+  - ../config/middleware/monitor.yaml
   roles: 
   - {role: test, tags: test }
   #- { role: cni/flannel, tags: flannel }

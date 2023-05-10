@@ -58,3 +58,33 @@
   when: 
   - OTTER_MIXED_ENABLE | default(false) | bool == false
   - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+
+# kubernetes image check
+- block:
+  - name: Check Kubernetes Image for Multi-architecture
+    stat: path={{ item }}
+    register: kubernetes_image_file_state
+    with_items:
+    - "{{ playbook_dir | dirname }}/files/images/k8s/x86_64/kubernetes.tar"
+    - "{{ playbook_dir | dirname }}/files/images/k8s/aarch64/kubernetes.tar"
+
+  - name: Kubernetes Image Not Exist
+    fail: msg="Kubernetes Image Not Exist"
+    when: false in ( kubernetes_image_file_state.results | map(attribute='stat.exists') | list )
+  any_errors_fatal: true
+  when:
+  - OTTER_MIXED_ENABLE | default(false) | bool == true
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block
+
+- block:
+  - name: Check Kubernetes Image Exist
+    stat: path={{ playbook_dir | dirname }}/files/images/k8s/{{ ansible_architecture }}/kubernetes.tar
+    register: kubernetes_image_file_state
+
+  - name: Kubernetes Image Not Exist
+    fail: msg="Kubernetes Image Not Exist"
+    when: kubernetes_image_file_state.exists == false
+  any_errors_fatal: true
+  when:
+  - OTTER_MIXED_ENABLE | default(false) | bool == true
+  - inventory_hostname == ansible_env['SSH_CLIENT'].split() | first   # just ansible controller run this block

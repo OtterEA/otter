@@ -13,19 +13,19 @@
       tags: always
   tags: k8s-clean-environment
 
+- name: Kubernetes Image Deal
+  include_tasks: 
+    file: 03-image-deal.yaml
+    apply:
+      tags: always
+  tags: k8s-image-deal
+
 - name: Init Environment for Kubernetes
   include_tasks: 
-    file: 03-init-environment.yaml
+    file: 04-init-environment.yaml
     apply:
       tags: always
   tags: k8s-init-environment
 
-- name: Kubernetes Image Deal
-  include_tasks: 
-    file: 04-image-deal.yaml
-    apply:
-      tags: always
-  tags: k8s-image-deal
-  when: HARBOR_ENABLE == true
 
 

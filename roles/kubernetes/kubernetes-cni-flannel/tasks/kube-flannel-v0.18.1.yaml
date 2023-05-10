@@ -170,8 +170,7 @@
             serviceAccountName: flannel
             initContainers:
             - name: install-cni-plugin
-             #image: flannelcni/flannel-cni-plugin:v1.1.0 for ppc64le and mips64le (dockerhub limitations may apply)
-              image: rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0
+              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-cni-plugin-v0.18.1'].split('/')[1:]|join('/') }}
               command:
               - cp
               args:
@@ -182,8 +181,7 @@
               - name: cni-plugin
                 mountPath: /opt/cni/bin
             - name: install-cni
-             #image: flannelcni/flannel:v0.18.1 for ppc64le and mips64le (dockerhub limitations may apply)
-              image: rancher/mirrored-flannelcni-flannel:v0.18.1
+              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[1:]|join('/') }}
               command:
               - cp
               args:
@@ -197,8 +195,7 @@
                 mountPath: /etc/kube-flannel/
             containers:
             - name: kube-flannel
-             #image: flannelcni/flannel:v0.18.1 for ppc64le and mips64le (dockerhub limitations may apply)
-              image: rancher/mirrored-flannelcni-flannel:v0.18.1
+              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[1:]|join('/') }}
               command:
               - /opt/bin/flanneld
               args:

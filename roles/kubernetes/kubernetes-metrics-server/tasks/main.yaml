@@ -142,7 +142,7 @@
               - --kubelet-use-node-status-port
               - --metric-resolution=15s
               - --kubelet-insecure-tls
-              image: registry.k8s.io/metrics-server/metrics-server:v0.6.3
+              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-metrics-server'].split('/')[1:]|join('/') }}
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3

@@ -194,8 +194,8 @@
                 type: RuntimeDefault
             containers:
               - name: kubernetes-dashboard
-                image: kubernetesui/dashboard:v2.7.0
-                imagePullPolicy: Always
+                image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-dashboard'].split('/')[1:]|join('/') }}
+                imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 8443
                     protocol: TCP
@@ -279,7 +279,8 @@
                 type: RuntimeDefault
             containers:
               - name: dashboard-metrics-scraper
-                image: kubernetesui/metrics-scraper:v1.0.8
+                image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-dashboard-metrics-scraper'].split('/')[1:]|join('/') }}
+                imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 8000
                     protocol: TCP

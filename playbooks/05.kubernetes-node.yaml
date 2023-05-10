@@ -1,5 +1,9 @@
 - hosts:
   - kubernetes_node
   ignore_unreachable: false
+  vars_files:
+  - ../config/otter.yaml
+  - ../config/middleware/harbor.yaml
+  - ../config/middleware/monitor.yaml
   roles: 
   - { role: kubernetes/kubernetes-node, tags: kubernetes-node }

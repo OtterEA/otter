@@ -1,5 +1,9 @@
 - hosts:
   - kubernetes_master_control_plane
   ignore_unreachable: false
+  vars_files:
+  - ../config/otter.yaml
+  - ../config/middleware/harbor.yaml
+  - ../config/middleware/monitor.yaml
   roles: 
   - { role: kubernetes/kubernetes-master-control-plane, tags: kubernetes-control-plane }

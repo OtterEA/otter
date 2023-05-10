@@ -69,10 +69,13 @@
   - name: Create Docker Configuration
     template: src=daemon.json.j2 dest=/etc/docker/daemon.json force=yes
   
-  # tips: 仅ansible 控制端不重启
-  - name: Enable Docker Service Enable
-    systemd: name=docker enabled=yes state=restarted daemon_reload=yes
+  - name: Enable Docker Service
+    systemd: name=docker enabled=yes state=started daemon_reload=yes
     any_errors_fatal: true
+  
+  # tips: 仅ansible 控制端不重启
+  #- name: Enable Docker Service Enable
+  #  systemd: name=docker enabled=yes state=restarted daemon_reload=yes
     #when: inventory_hostname != ansible_env['SSH_CLIENT'].split() | first
   
   - name: Wait for Docker Run

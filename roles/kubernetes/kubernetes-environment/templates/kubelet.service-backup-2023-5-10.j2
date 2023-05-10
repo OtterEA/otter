@@ -23,6 +23,11 @@ ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/devices/system.slice
 ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/blkio/system.slice
 ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/hugetlb/system.slice
 ExecStart=/usr/bin/kubelet \
+{% if ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == false %}
+  --pod-infra-container-image={{ KUBERNETES_IMAGE_REPO }}/pause:3.8 \
+{% elif ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == true %}
+  --pod-infra-container-image={{ HARBOR_DOMAIN }}/k8s/pause:3.8 \
+{% endif %}
   --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf \
   --kubeconfig=/etc/kubernetes/kubelet.conf \
   --config=/var/lib/kubelet/config.yaml \

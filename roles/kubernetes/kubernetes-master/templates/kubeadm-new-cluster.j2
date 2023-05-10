@@ -22,12 +22,8 @@ controlPlaneEndpoint: apiserver.cluster.local:6443
 {% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
 controlPlaneEndpoint: apiserver.cluster.local:16443
 {% endif %}
-{# 设置镜像坐标 #}
-{% if ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == false %}
-imageRepository: {{ KUBERNETES_IMAGE_REPO }}
-{% elif ( OTTER_INSTALL_METHOD == "online" or OTTER_INSTALL_METHOD == "offline") and HARBOR_ENABLE == true %}
+{# 设置镜像坐标,无论在线还是离线镜像都是从harbor_domain为基础初始化集群 #}
 imageRepository: {{ HARBOR_DOMAIN }}/k8s
-{% endif %}
 certificatesDir: "/etc/kubernetes/pki"
 networking:
   dnsDomain: cluster.local

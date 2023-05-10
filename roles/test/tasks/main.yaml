@@ -1,2 +1,0 @@
-- name: debug-1
-  debug: msg={{ K8S_IMAGE['k8s-flannel-v0.21.4']['k8s-flannel-v0.21.4'].split('/')[1:]|join('/') }}

@@ -47,29 +47,36 @@ ONLINE:
   CENTOS7_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack-tools
   CENTOS8_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack-tools
   ROCKY9_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack-tools
   UBUNTU2204_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack
   UBUNTU2104_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack
   UBUNTU2004_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack
   UBUNTU1804_SOFTWARE:
   - bash-completion
   - socat 
+  - tar
   - conntrack
 OFFLINE:

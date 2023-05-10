@@ -194,7 +194,7 @@
                 type: RuntimeDefault
             containers:
               - name: kubernetes-dashboard
-                image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-dashboard'].split('/')[1:]|join('/') }}
+                image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-dashboard'].split('/')[2] }}
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 8443
@@ -279,7 +279,7 @@
                 type: RuntimeDefault
             containers:
               - name: dashboard-metrics-scraper
-                image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-dashboard-metrics-scraper'].split('/')[1:]|join('/') }}
+                image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-dashboard-metrics-scraper'].split('/')[2] }}
                 imagePullPolicy: IfNotPresent
                 ports:
                   - containerPort: 8000

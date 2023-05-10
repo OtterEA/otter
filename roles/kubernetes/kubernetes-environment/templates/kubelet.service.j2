@@ -23,6 +23,7 @@ ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/devices/system.slice
 ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/blkio/system.slice
 ExecStartPre=/usr/bin/mkdir -p /sys/fs/cgroup/hugetlb/system.slice
 ExecStart=/usr/bin/kubelet \
+  --pod-infra-container-image={{ HARBOR_DOMAIN }}/k8s/pause:3.8 \
   --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf \
   --kubeconfig=/etc/kubernetes/kubelet.conf \
   --config=/var/lib/kubelet/config.yaml \

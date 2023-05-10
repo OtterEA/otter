@@ -279,7 +279,7 @@ function download_kubernetes_image(){
     # check kubeadm command exist, and pull kubernetes images
     if command_exist kubeadm ; then
         # check kubeadm version,but version is not correct
-        if ! kubeadm --version | grep $k8s_version &>/dev/null ; then
+        if ! kubeadm version | grep $k8s_version &>/dev/null ; then
             logger warn "kubeadm version is $k8s_version,but os system version is not $k8s_version"
             [[ ! -f $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz ]] \
             && { logger error "$otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz is not exist,please download resource"; exit 1; }
@@ -290,10 +290,11 @@ function download_kubernetes_image(){
             && logger info "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes success" \
             || { logger error "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes failed"; exit 1; }
 
-            local k8s_image_list=($(/tmp/otter/kubernetes/node/bin/kubeadm config images list 2>/dev/null | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g")) 
+            # don't contain pause
+            local k8s_image_list=($(/tmp/otter/kubernetes/node/bin/kubeadm config images list 2>/dev/null | grep -v pause | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g")) 
         else
             # kubeadm command exist and version correct
-            local k8s_image_list=($(kubeadm config images list 2>/dev/null | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g"))
+            local k8s_image_list=($(kubeadm config images list 2>/dev/null | grep -v pause | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g"))
         fi
     else
         # kubeadm command not exist
@@ -307,8 +308,11 @@ function download_kubernetes_image(){
         && logger info "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes success" \
         || { logger error "decompress $otter_base_dir/files/bin/k8s/$os_architecture/kubernetes-v${k8s_version}.tgz to /tmp/otter/kubernetes failed"; exit 1; }
 
-        local k8s_image_list=($(/tmp/otter/kubernetes/node/bin/kubeadm config images list 2>/dev/null | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g")) 
+        local k8s_image_list=($(/tmp/otter/kubernetes/node/bin/kubeadm config images list 2>/dev/null | grep -v pause | sed -r "s#(.*)/(.*)#${k8s_image_repo}/\2#g")) 
     fi
+
+    # pull pause images
+    k8s_image_list=(${k8s_image_list[@]} "$(get_config KUBERNETES_IMAGE_REPO $otter_config_file)/pause:3.8" )
 
     # pull flannel images
     if [[ $(echo "${k8s_version%.*} >= 1.25" | bc ) -eq 1 ]]; then
@@ -322,6 +326,11 @@ function download_kubernetes_image(){
 
     # pull dashboard images
     k8s_image_list=(${k8s_image_list[@]} $(get_config k8s-dashboard $otter_config_file) $(get_config k8s-dashboard-metrics-scraper $otter_config_file))
+
+    #for i in ${k8s_image_list[@]}; do
+    #    echo $i
+    #done
+    #exit 1
 
     # download k8s image,must use k8s_image_list[*] not k8s_image_list[@]
     [[ $otter_mixed_enable = true ]] \

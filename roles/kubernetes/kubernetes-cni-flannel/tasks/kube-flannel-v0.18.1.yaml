@@ -170,7 +170,7 @@
             serviceAccountName: flannel
             initContainers:
             - name: install-cni-plugin
-              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-cni-plugin-v0.18.1'].split('/')[1:]|join('/') }}
+              image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-cni-plugin-v0.18.1'].split('/')[2] }}
               command:
               - cp
               args:
@@ -181,7 +181,7 @@
               - name: cni-plugin
                 mountPath: /opt/cni/bin
             - name: install-cni
-              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[1:]|join('/') }}
+              image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[2] }}
               command:
               - cp
               args:
@@ -195,7 +195,7 @@
                 mountPath: /etc/kube-flannel/
             containers:
             - name: kube-flannel
-              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[1:]|join('/') }}
+              image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-flannel-v0.18.1']['k8s-flannel-v0.18.1'].split('/')[2] }}
               command:
               - /opt/bin/flanneld
               args:

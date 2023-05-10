@@ -1,7 +1,7 @@
 #!/bin/bash
 # ipvs 单master加入集群脚本
-if ! grep "192.168.0.133 apiserver.cluster.local" /etc/hosts ; then
-	echo "192.168.0.133 apiserver.cluster.local" >> /etc/hosts
+if ! grep "192.168.0.21 apiserver.cluster.local" /etc/hosts ; then
+	echo "192.168.0.21 apiserver.cluster.local" >> /etc/hosts
 fi
 
 # 节点加入集群
@@ -14,7 +14,7 @@ discovery:
     apiServerEndpoint: apiserver.cluster.local:6443
     token: 9a08jv.c0izixklcxtmnze7
     caCertHashes:
-    - sha256:8d6e212f0a4f03acfc14d42d492134b9441cb17e16ae70e328e940ef80c2c69c
+    - sha256:200739b296b840bbd419b8e9e028823264a8f3a1c9ef14a7d57f4fb87d1daa41
 EOF
 kubeadm join --config /tmp/otter/kubeadm-new-node
 

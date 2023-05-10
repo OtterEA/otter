@@ -83,7 +83,7 @@
 
   - name: Kubernetes Image Not Exist
     fail: msg="Kubernetes Image Not Exist"
-    when: kubernetes_image_file_state.exists == false
+    when: kubernetes_image_file_state.stat.exists == false
   any_errors_fatal: true
   when:
   - OTTER_MIXED_ENABLE | default(false) | bool == true

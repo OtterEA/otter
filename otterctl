@@ -50,7 +50,20 @@ function start_copy_ssh_key(){
 }
 
 function install_kubernetes(){
-    echo 1
+    # 01.init.yaml
+    docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/01.init.yaml"
+
+    # 02.runtime.yaml
+    docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/02.runtime.yaml"
+
+    # 03.kubernetes-master.yaml
+    docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/03.kubernetes-master.yaml"
+
+    # 04.kubernetes-master-control-plane.yaml
+    #docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/04.kubernetes-master-control-plane.yaml"
+
+    # 05.kubernetes-node.yaml
+    docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/05.kubernetes-node.yaml"
 }
 
 function install_harbor(){

@@ -71,11 +71,13 @@
 # 设置主机名称
 - block: 
   - name: Set Master Node Name
-    hostname: name="{{ inventory_hostname|replace('.','-') }}.master"
+    shell: hostnamectl set-hostname {{ inventory_hostname|replace('.','-') }}.master
+    #hostname: name="{{ inventory_hostname|replace('.','-') }}.master"
     when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
 
   - name: Set Work Node Name
-    hostname: name="{{ inventory_hostname|replace('.','-') }}.node"
+    shell: hostnamectl set-hostname {{ inventory_hostname|replace('.','-') }}.node
+    #hostname: name="{{ inventory_hostname|replace('.','-') }}.node"
     when: inventory_hostname in groups['kubernetes_node']
   
 # 设置本地域名解析

@@ -138,3 +138,5 @@ K8S_IMAGE:
   k8s-dashboard-metrics-scraper: docker.io/kubernetesui/metrics-scraper:v1.0.8
   # k8s metrics-server镜像
   k8s-metrics-server: docker.io/bitnami/metrics-server:0.6.3
+  # k8s lvscare 镜像
+  k8s-lvscare: docker.io/fanux/lvscare:v1.1.1

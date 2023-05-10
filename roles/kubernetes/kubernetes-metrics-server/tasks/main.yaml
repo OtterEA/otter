@@ -142,7 +142,7 @@
               - --kubelet-use-node-status-port
               - --metric-resolution=15s
               - --kubelet-insecure-tls
-              image: {{ HARBOR_DOMAIN }}/{{ K8S_IMAGE['k8s-metrics-server'].split('/')[1:]|join('/') }}
+              image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-metrics-server'].split('/')[2] }}
               imagePullPolicy: IfNotPresent
               livenessProbe:
                 failureThreshold: 3

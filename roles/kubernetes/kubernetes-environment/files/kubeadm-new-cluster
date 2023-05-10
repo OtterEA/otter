@@ -10,7 +10,7 @@ bootstrapTokens:
   groups:
   - system:bootstrappers:kubeadm:default-node-token
 localAPIEndpoint:
-  advertiseAddress: 192.168.0.133
+  advertiseAddress: 192.168.0.21
   bindPort: 6443
 certificateKey: 5333dd1e432c9a3563870608bea3e412d664040d891492aa6fb1c47d95cefe6c
 ---
@@ -18,7 +18,7 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: 1.23.17
 controlPlaneEndpoint: apiserver.cluster.local:6443
-imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+imageRepository: registry.otter.local/k8s
 certificatesDir: "/etc/kubernetes/pki"
 networking:
   dnsDomain: cluster.local

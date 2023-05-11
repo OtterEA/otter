@@ -27,7 +27,7 @@ DOCKER_ROOT_DATA: /var/lib/docker
 DOCKER_DRIVER: systemd
 
 # docker网段设置(如有网络冲突，可自行修改,一般默认即可)
-DOCKER_BIP: 192.168.244.1/24
+DOCKER_BIP: 192.168.100.1/24
 
 # Docker Remote API是否开启
 DOCKER_REMOTE_API_ENABLE: false
@@ -118,6 +118,9 @@ HELM_VERSION: 3.11.3
 
 # k9s版本
 K9S_VERSION: 0.27.3
+
+# etcd版本(二进制)
+ETCD_VERSION: 3.5.9
 
 ######## 集群镜像坐标 ###########################
 # otter容器镜像坐标

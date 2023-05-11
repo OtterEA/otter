@@ -20,19 +20,27 @@ function download_docker_binary_file(){
     if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/aarch64/docker-${docker_version}.tgz \
-            $otter_base_dir/files/bin/docker/aarch64/docker-${docker_version}.tgz || exit 1
+            $otter_base_dir/files/bin/docker/aarch64/docker-${docker_version}.tgz \
+        && logger info "$docker_version $os_architecture download success" \
+        || { logger error "$docker_version $os_architecture download failed"; exit 1; }
 
         download_resource \
             https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${docker_version}.tgz \
-            $otter_base_dir/files/bin/docker/x86_64/docker-${docker_version}.tgz || exit 1
+            $otter_base_dir/files/bin/docker/x86_64/docker-${docker_version}.tgz \
+        && logger info "$docker_version $os_architecture download success" \
+        || { logger error "$docker_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
         download_resource \
             https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/aarch64/docker-${docker_version}.tgz \
-            $otter_base_dir/files/bin/docker/aarch64/docker-${docker_version}.tgz || exit 1
+            $otter_base_dir/files/bin/docker/aarch64/docker-${docker_version}.tgz \
+        && logger info "$docker_version $os_architecture download success" \
+        || { logger error "$docker_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
         download_resource \
             https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/static/stable/x86_64/docker-${docker_version}.tgz \
-            $otter_base_dir/files/bin/docker/x86_64/docker-${docker_version}.tgz || exit 1
+            $otter_base_dir/files/bin/docker/x86_64/docker-${docker_version}.tgz \
+        && logger info "$docker_version $os_architecture download success" \
+        || { logger error "$docker_version $os_architecture download failed"; exit 1; }
     else
         logger error "docker os architecture check failed" 
         exit 1
@@ -53,19 +61,27 @@ function download_kubernetes_node_binary_file(){
     if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://dl.k8s.io/v${kubernetes_version}/kubernetes-node-linux-arm64.tar.gz \
-            $otter_base_dir/files/bin/k8s/aarch64/kubernetes-v${kubernetes_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k8s/aarch64/kubernetes-v${kubernetes_version}.tgz \
+        && logger info "kubernetes-node $kubernetes_version $os_architecture download success" \
+        || { logger error "kubernetes-node $kubernetes_version $os_architecture download failed"; exit 1; }
 
         download_resource \
             https://dl.k8s.io/v${kubernetes_version}/kubernetes-node-linux-amd64.tar.gz \
-            $otter_base_dir/files/bin/k8s/x86_64/kubernetes-v${kubernetes_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k8s/x86_64/kubernetes-v${kubernetes_version}.tgz \
+        && logger info "kubernetes-node $kubernetes_version $os_architecture download success" \
+        || { logger error "kubernetes-node $kubernetes_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
         download_resource \
             https://dl.k8s.io/v${kubernetes_version}/kubernetes-node-linux-arm64.tar.gz \
-            $otter_base_dir/files/bin/k8s/aarch64/kubernetes-v${kubernetes_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k8s/aarch64/kubernetes-v${kubernetes_version}.tgz \
+        && logger info "kubernetes-node $kubernetes_version $os_architecture download success" \
+        || { logger error "kubernetes-node $kubernetes_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
         download_resource \
             https://dl.k8s.io/v${kubernetes_version}/kubernetes-node-linux-amd64.tar.gz \
-            $otter_base_dir/files/bin/k8s/x86_64/kubernetes-v${kubernetes_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k8s/x86_64/kubernetes-v${kubernetes_version}.tgz \
+        && logger info "kubernetes-node $kubernetes_version $os_architecture download success" \
+        || { logger error "kubernetes-node $kubernetes_version $os_architecture download failed"; exit 1; }
     else
         logger error "kubernetes os architecture check failed"
         exit 1
@@ -87,19 +103,27 @@ function download_cni_plugin_binary_file(){
     if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/containernetworking/plugins/releases/download/v${cni_plugin_version}/cni-plugins-linux-arm64-v${cni_plugin_version}.tgz \
-            $otter_base_dir/files/bin/cni-plugin/aarch64/cni-plugin-v${cni_plugin_version}.tgz || exit 1
+            $otter_base_dir/files/bin/cni-plugin/aarch64/cni-plugin-v${cni_plugin_version}.tgz \
+        && logger info "cni plugin $cni_plugin_version $os_architecture download success" \
+        || { logger error "cni plugin $cni_plugin_version $os_architecture download failed"; exit 1; }
 
         download_resource \
             https://ghproxy.com/https://github.com/containernetworking/plugins/releases/download/v${cni_plugin_version}/cni-plugins-linux-amd64-v${cni_plugin_version}.tgz \
-            $otter_base_dir/files/bin/cni-plugin/x86_64/cni-plugin-v${cni_plugin_version}.tgz || exit 1
+            $otter_base_dir/files/bin/cni-plugin/x86_64/cni-plugin-v${cni_plugin_version}.tgz \
+        && logger info "cni plugin $cni_plugin_version $os_architecture download success" \
+        || { logger error "cni plugin $cni_plugin_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/containernetworking/plugins/releases/download/v${cni_plugin_version}/cni-plugins-linux-arm64-v${cni_plugin_version}.tgz \
-            $otter_base_dir/files/bin/cni-plugin/aarch64/cni-plugin-v${cni_plugin_version}.tgz || exit 1
+            $otter_base_dir/files/bin/cni-plugin/aarch64/cni-plugin-v${cni_plugin_version}.tgz \
+        && logger info "cni plugin $cni_plugin_version $os_architecture download success" \
+        || { logger error "cni plugin $cni_plugin_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/containernetworking/plugins/releases/download/v${cni_plugin_version}/cni-plugins-linux-amd64-v${cni_plugin_version}.tgz \
-            $otter_base_dir/files/bin/cni-plugin/x86_64/cni-plugin-v${cni_plugin_version}.tgz || exit 1
+            $otter_base_dir/files/bin/cni-plugin/x86_64/cni-plugin-v${cni_plugin_version}.tgz \
+        && logger info "cni plugin $cni_plugin_version $os_architecture download success" \
+        || { logger error "cni plugin $cni_plugin_version $os_architecture download failed"; exit 1; }
     else
         logger error "cni plugin os architecture check failed"
         exit 1
@@ -120,19 +144,27 @@ function download_k9s_binary_file(){
     if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/derailed/k9s/releases/download/v${k9s_version}/k9s_Linux_arm64.tar.gz \
-            $otter_base_dir/files/bin/k9s/aarch64/k9s-v${k9s_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k9s/aarch64/k9s-v${k9s_version}.tgz \
+        && logger info "k9s $k9s_version $os_architecture download success" \
+        || { logger error "k9s $k9s_version $os_architecture download failed"; exit 1; }
 
         download_resource \
             https://ghproxy.com/https://github.com/derailed/k9s/releases/download/v${k9s_version}/k9s_Linux_amd64.tar.gz \
-            $otter_base_dir/files/bin/k9s/x86_64/k9s-v${k9s_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k9s/x86_64/k9s-v${k9s_version}.tgz \
+        && logger info "k9s $k9s_version $os_architecture download success" \
+        || { logger error "k9s $k9s_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/derailed/k9s/releases/download/v${k9s_version}/k9s_Linux_arm64.tar.gz \
-            $otter_base_dir/files/bin/k9s/aarch64/k9s-v${k9s_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k9s/aarch64/k9s-v${k9s_version}.tgz \
+        && logger info "k9s $k9s_version $os_architecture download success" \
+        || { logger error "k9s $k9s_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
         download_resource \
             https://ghproxy.com/https://github.com/derailed/k9s/releases/download/v${k9s_version}/k9s_Linux_amd64.tar.gz \
-            $otter_base_dir/files/bin/k9s/x86_64/k9s-v${k9s_version}.tgz || exit 1
+            $otter_base_dir/files/bin/k9s/x86_64/k9s-v${k9s_version}.tgz \
+        && logger info "k9s $k9s_version $os_architecture download success" \
+        || { logger error "k9s $k9s_version $os_architecture download failed"; exit 1; }
     else
         logger error "helm os architecture check failed"
         exit 1
@@ -153,19 +185,27 @@ function download_helm_binary_file(){
     if [[ $otter_mixed_enable = true ]]; then
         download_resource \
             https://mirrors.huaweicloud.com/helm/v${helm_version}/helm-v${helm_version}-linux-arm64.tar.gz \
-            $otter_base_dir/files/bin/helm/aarch64/helm-v${helm_version}.tgz || exit 1
+            $otter_base_dir/files/bin/helm/aarch64/helm-v${helm_version}.tgz \
+        && logger info "helm $helm_version $os_architecture download success" \
+        || { logger error "helm $helm_version $os_architecture download failed"; exit 1; }
 
         download_resource \
             https://mirrors.huaweicloud.com/helm/v${helm_version}/helm-v${helm_version}-linux-amd64.tar.gz \
-            $otter_base_dir/files/bin/helm/x86_64/helm-v${helm_version}.tgz || exit 1
+            $otter_base_dir/files/bin/helm/x86_64/helm-v${helm_version}.tgz \
+        && logger info "helm $helm_version $os_architecture download success" \
+        || { logger error "helm $helm_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
         download_resource \
             https://mirrors.huaweicloud.com/helm/v${helm_version}/helm-v${helm_version}-linux-arm64.tar.gz \
-            $otter_base_dir/files/bin/helm/aarch64/helm-v${helm_version}.tgz || exit 1
+            $otter_base_dir/files/bin/helm/aarch64/helm-v${helm_version}.tgz \
+        && logger info "helm $helm_version $os_architecture download success" \
+        || { logger error "helm $helm_version $os_architecture download failed"; exit 1; }
     elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
         download_resource \
             https://mirrors.huaweicloud.com/helm/v${helm_version}/helm-v${helm_version}-linux-amd64.tar.gz \
-            $otter_base_dir/files/bin/helm/x86_64/helm-v${helm_version}.tgz || exit 1
+            $otter_base_dir/files/bin/helm/x86_64/helm-v${helm_version}.tgz \
+        && logger info "helm $helm_version $os_architecture download success" \
+        || { logger error "helm $helm_version $os_architecture download failed"; exit 1; }
     else
         logger error "helm os architecture check failed"
         exit 1
@@ -173,8 +213,45 @@ function download_helm_binary_file(){
 }
 
 # todo: need to do it
+# etcd 下载地址：https://github.com/etcd-io/etcd/releases
+# 文件名称： /root/otter/files/bin/etcd/x86_64/etcd-v3.6.9.tar.gz
+# https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v3.5.9/etcd-v3.5.9-linux-amd64.tar.gz
+# https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v3.5.9/etcd-v3.5.9-linux-arm64.tar.gz
 function download_etcd_binary_file(){
-    echo "1"
+    local otter_base_dir=${1:?otter_base_dir missing}
+    local otter_config_file=${2:?config file missing}
+
+    local otter_mixed_enable=$(get_config OTTER_MIXED_ENABLE $otter_config_file)
+    local os_architecture=$(arch)
+    local etcd_version=$(get_config ETCD_VERSION $otter_config_file)
+    if [[ $otter_mixed_enable = true ]]; then
+        download_resource \
+            https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v${etcd_version}/etcd-v${etcd_version}-linux-arm64.tar.gz \
+            $otter_base_dir/files/bin/etcd/aarch64/etcd-v${etcd_version}.tgz \
+        && logger info "etcd $etcd_version $os_architecture download success" \
+        || { logger error "helm $etcd_version $os_architecture download failed"; exit 1; }
+
+        download_resource \
+            https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v${etcd_version}/etcd-v${etcd_version}-linux-amd64.tar.gz \
+            $otter_base_dir/files/bin/etcd/x86_64/etcd-v${etcd_version}.tgz \
+        && logger info "etcd $etcd_version $os_architecture download success" \
+        || { logger error "helm $etcd_version $os_architecture download failed"; exit 1; }
+    elif [[ $otter_mixed_enable = false && $os_architecture = "aarch64" ]]; then
+        download_resource \
+            https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v${etcd_version}/etcd-v${etcd_version}-linux-arm64.tar.gz \
+            $otter_base_dir/files/bin/etcd/aarch64/etcd-v${etcd_version}.tgz \
+        && logger info "etcd $etcd_version $os_architecture download success" \
+        || { logger error "helm $etcd_version $os_architecture download failed"; exit 1; }
+    elif [[ $otter_mixed_enable = false && $os_architecture = "x86_64" ]]; then
+        download_resource \
+            https://ghproxy.com/https://github.com/etcd-io/etcd/releases/download/v${etcd_version}/etcd-v${etcd_version}-linux-amd64.tar.gz \
+            $otter_base_dir/files/bin/etcd/x86_64/etcd-v${etcd_version}.tgz \
+        && logger info "etcd $etcd_version $os_architecture download success" \
+        || { logger error "helm $etcd_version $os_architecture download failed"; exit 1; }
+    else
+        logger error "etcd os architecture check failed"
+        exit 1
+    fi
 }
 
 ############################

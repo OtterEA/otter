@@ -87,20 +87,20 @@
       lineinfile:
         dest: /etc/hosts
         state: present
-        line: "127.0.0.1    {{ inventory_hostname|replace('.','-') }}.master"
+        line: "127.0.0.1 {{ inventory_hostname|replace('.','-') }}.master"
 
     - name: Set Kubernetes API Server Host
       lineinfile:
         dest: /etc/hosts
         state: present
-        line: "127.0.0.1    apiserver.cluster.local"
+        line: "127.0.0.1 apiserver.cluster.local"
     when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
     
   - name: Set Kubernetes Hosts for Work Node
     lineinfile:
       dest: /etc/hosts
       state: present
-      line: "127.0.0.1    {{ inventory_hostname|replace('.','-') }}.node"
+      line: "127.0.0.1 {{ inventory_hostname|replace('.','-') }}.node"
     when: inventory_hostname in groups['kubernetes_node']
   
 - name: Create Kubernetes token.csv

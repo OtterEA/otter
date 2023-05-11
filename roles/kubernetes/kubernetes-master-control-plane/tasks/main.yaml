@@ -7,5 +7,20 @@
 
 ############################## 节点加入集群 ###############################
 - name: Kubernetes Master Node Join Cluster
-  script: "{{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_node_join.sh"
+  script: "{{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_master_join.sh"
+  throttle: 1               # fix multi master join cause some nodes can't join cluster
   any_errors_fatal: true
+
+################### 部署Helm3 ###################################
+- name: Deploy Helm
+  include_role:
+    name: kubernetes/kubernetes-helm
+    apply:
+      tags: always
+
+################### 部署K9S #####################################
+- name: Deploy K9S
+  include_role:
+    name: kubernetes/kubernetes-k9s
+    apply:
+      tags: always

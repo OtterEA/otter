@@ -7,8 +7,8 @@
 
 #### K8S 集群初始化
 - block: 
-  - name: Init Kubernetes Cluster
-    shell: kubeadm init --config {{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-cluster --upload-certs -v 0
+  - name: Init Kubernetes Cluster           # --ignore-preflight-errors=all fix kubeadm init image pull check
+    shell: kubeadm init --config {{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubeadm-new-cluster --upload-certs -v 0 --ignore-preflight-errors=all
     register: kubernetes_init_result
   
   - name: Init Kubernetes Failed

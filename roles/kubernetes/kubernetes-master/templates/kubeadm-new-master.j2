@@ -10,3 +10,10 @@ discovery:
     token: {{ KUBERNETES_BOOTSTRAP_TOKEN }}
     caCertHashes:
     - sha256:{{ ca_hex_encoded_hash.stdout }}
+controlPlane:
+  localAPIEndpoint:
+    #advertiseAddress: {{ inventory_hostname }} 
+    #advertiseAddress: apiserver.cluster.local # will be change to 127 after join cluster
+    advertiseAddress: 0.0.0.0
+    bindPort: 6443
+  certificateKey: {{ KUBERNETES_CERTIFICATE_KEY }}

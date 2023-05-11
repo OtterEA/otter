@@ -28,6 +28,10 @@ apiServer:
   certSANs:
   - 127.0.0.1
   - apiserver.cluster.local
+  - 192.168.0.21
+  - 192.168.0.22
+  - 192.168.0.23
+  - 192.168.0.25
   extraArgs:
     feature-gates: TTLAfterFinished=true,EphemeralContainers=true
     enable-aggregator-routing: "true"
@@ -71,10 +75,6 @@ etcd:
       election-timeout: "5000"
 dns:
   type: CoreDNS
-  # 可能版本问题，官网显示支持，实际不支持
-  #ImageMeta:
-  #  imageRepository: 
-  #  imageTag:
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration
@@ -147,3 +147,6 @@ kind: KubeProxyConfiguration
 bindAddress: 0.0.0.0
 metricsBindAddress: 0.0.0.0 
 mode: ipvs
+ipvs:             
+  excludeCIDRs:
+  - 192.168.0.25/32

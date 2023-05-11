@@ -32,7 +32,7 @@
 | --------------- | ------------- | -------- |
 | 单master/多node | iptables/ipvs | ✅        |
 | 多master/多node | iptables      | ❌        |
-| 多master/多node | ipvs          | ❌        |
+| 多master/多node | ipvs          | ✅        |
 
 ### CNI类型适配
 

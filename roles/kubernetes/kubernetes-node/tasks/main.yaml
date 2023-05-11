@@ -8,4 +8,5 @@
 ############################## 节点加入集群 ###############################
 - name: Kubernetes Work Node Join Cluster
   script: "{{ role_path.split('/')[0:-1] | join('/') }}/kubernetes-environment/files/kubernetes_node_join.sh"
+  throttle: 1               # fix multi master join cause some nodes can't join cluster
   any_errors_fatal: true

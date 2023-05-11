@@ -22,7 +22,7 @@ spec:
 {% endfor %}
     command:
     - /usr/bin/lvscare
-    image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-lvscare'] }}
+    image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-lvscare'].split('/')[2] }}
     imagePullPolicy: IfNotPresent
     name: kube-sealyun-lvscare
     securityContext:

@@ -24,16 +24,18 @@ function start_otter(){
 }
 
 function start_copy_ssh_key(){
+    TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S')
+
     # generate ssh key
     generateSSHKey
 
     # get all node ip
     local node_ip_list=(`grep -oE "^[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}" $BASE_DIR/config/otter.ini | sort -ru`)
-    echo -ne "\033[33m[ INPUT ROOT PASSWORD ]\033[0m : "
-    read node_root_password
-
-    echo -ne "\033[33m[ INPUT SSH PORT ]\033[0m : "
+    echo -ne "$TIMESTAMP \033[33m[INPUT SSH PORT]\033[0m "
     read node_ssh_port
+
+    echo -ne "$TIMESTAMP \033[33m[INPUT ROOT PASSWORD]\033[0m "
+    read node_root_password
 
     # validate node_ip
     for ip in ${node_ip_list[@]} ; do
@@ -60,7 +62,7 @@ function install_kubernetes(){
     docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/03.kubernetes-master.yaml"
 
     # 04.kubernetes-master-control-plane.yaml
-    #docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/04.kubernetes-master-control-plane.yaml"
+    docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/04.kubernetes-master-control-plane.yaml"
 
     # 05.kubernetes-node.yaml
     docker exec otter /bin/bash -c "cd $BASE_DIR ; ansible-playbook -i $BASE_DIR/config/otter.ini $BASE_DIR/playbooks/05.kubernetes-node.yaml"

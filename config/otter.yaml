@@ -56,7 +56,7 @@ KUBERNETES_CNI_TYPE: flannel
 
 # k8s VIP，当K8S高可用时,node节点将基于lvscare，使用这个VIP与APIserver通信
 # 当节点数<=3时，可不用填
-KUBERNETES_VIP: 127.0.0.1
+KUBERNETES_VIP: 192.168.0.25
 
 # k8s etcd数据目录(如有单独磁盘供etcd使用，可修改该路径-在安装前修改)
 KUBERNETES_ETCD_DATA_DIR: /var/lib/etcd
@@ -65,10 +65,10 @@ KUBERNETES_ETCD_DATA_DIR: /var/lib/etcd
 KUBERNETES_SCHEDULE_ENABLE: true
 
 # 是否部署metrics server组件
-KUBERNETES_METRICS_SERVER_ENABLE: true
+KUBERNETES_METRICS_SERVER_ENABLE: false
 
 # 是否部署kubernetes dashboard
-KUBERNETES_DASHBOARD_ENABLE: true
+KUBERNETES_DASHBOARD_ENABLE: false
 
 # k8s deschduler组件是否部署(不清楚该组件作用，请勿部署)
 KUBERNETES_DSCHEDULE_ENABLE: false

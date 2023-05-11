@@ -10,7 +10,9 @@ fi
 cat > /tmp/otter/kubeadm-new-node <<EOF
 {{ lookup('template','kubeadm-new-node.j2') }}
 EOF
-kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# --ignore-preflight-errors=all fix kubeadm init image pull check
+kubeadm join --config /tmp/otter/kubeadm-new-node --ignore-preflight-errors=all
 
 # 生成bootstrap-kubelet.conf配置文件
 cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF
@@ -25,15 +27,17 @@ if grep "{{ KUBERNETES_VIP }} apiserver.cluster.local" /etc/hosts; then
     sed -i "/{{ KUBERNETES_VIP }} apiserver.cluster.local/d" /etc/hosts
 fi
 
-if ! grep "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local"  /etc/hosts; then
-    echo "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" /etc/hosts
+if ! grep "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" /etc/hosts; then
+    echo "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" >> /etc/hosts
 fi
 
 # 节点加入集群
 cat > /tmp/otter/kubeadm-new-node << EOF
 {{ lookup('template','kubeadm-new-node.j2') }}
 EOF
-kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# --ignore-preflight-errors=all fix kubeadm init image pull check
+kubeadm join --config /tmp/otter/kubeadm-new-node --ignore-preflight-errors=all
 
 # 生成bootstrap-kubelet.conf文件
 cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF
@@ -42,7 +46,7 @@ EOF
 
 # 生成lvscare
 cat > /etc/kubernetes/manifests/kube-sealyun-lvscare.yaml <<EOF
-{{ lookup('template','kubeadm-new-node.j2') }}
+{{ lookup('template','kubernetes-lvscare.yaml.j2') }}
 EOF
 
 # 将域名调整为vip
@@ -61,7 +65,9 @@ fi
 cat > /tmp/otter/kubeadm-new-node <<EOF
 {{ lookup('template','kubeadm-new-node.j2') }}
 EOF
-kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# --ignore-preflight-errors=all fix kubeadm init image pull check
+kubeadm join --config /tmp/otter/kubeadm-new-node --ignore-preflight-errors=all
 
 # 生成bootstrap-kubelet.conf文件
 cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF

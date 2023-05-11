@@ -1,19 +1,21 @@
-{% if kubernetes_tmp_network_model == "ipvs" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+{% if kubernetes_tmp_network_model == "ipvs" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length >= 3 %}
 #!/bin/bash
 # ipvs模式,删除回环信息
 if grep "127.0.0.1 apiserver.cluster.local" /etc/hosts ; then
     sed -i '/127.0.0.1 apiserver.cluster.local/d' /etc/hosts
 fi
 
-if ! grep "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" /etc/hosts ; then
-    echo "{{ groups["kubernetes_master"][0] }} apiserver.cluster.local" >> /etc/hosts
+if ! grep "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" /etc/hosts ; then
+    echo "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" >> /etc/hosts
 fi
 
 # 节点加入集群
 cat > /tmp/otter/kubeadm-new-node << EOF
-{{ lookup('template','kubeadm-new-node.j2') }}
+{{ lookup('template','kubeadm-new-master.j2') }}
 EOF
-kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# --ignore-preflight-errors=all fix kubeadm init image pull check
+kubeadm join --config /tmp/otter/kubeadm-new-node --ignore-preflight-errors=all
 
 # token.csv in kubernetes-environment role
 
@@ -27,10 +29,13 @@ cp -apf /etc/kubernetes/admin.conf ~/.kube/config
 
 sleep 30
 
-#todo: delete control-nodes taints
+# delete control-nodes taints
+{% if KUBERNETES_SCHEDULE_ENABLE == true %}
+kubectl taint nodes --all node-role.kubernetes.io/master- | cat
+{% endif %}
 
-sed -i "s@{{ groups["kubernetes_master"][0] }} apiserver.cluster.local@127.0.0.1 apiserver.cluster.local@g"  /etc/hosts
+sed -i "s@{{ groups['kubernetes_master'][0] }} apiserver.cluster.local@127.0.0.1 apiserver.cluster.local@g"  /etc/hosts
 
-{% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
+{% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length >= 3 %}
 
 {% endif %}

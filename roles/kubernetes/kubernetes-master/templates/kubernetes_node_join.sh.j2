@@ -20,6 +20,33 @@ EOF
 {% elif groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
 #!/bin/bash
 # ipvs 多master节点node节点加入集群脚本
+# 集群必须以第一个master节点IP加入集群
+if grep "{{ KUBERNETES_VIP }} apiserver.cluster.local" /etc/hosts; then
+    sed -i "/{{ KUBERNETES_VIP }} apiserver.cluster.local/d" /etc/hosts
+fi
+
+if ! grep "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local"  /etc/hosts; then
+    echo "{{ groups['kubernetes_master'][0] }} apiserver.cluster.local" /etc/hosts
+fi
+
+# 节点加入集群
+cat > /tmp/otter/kubeadm-new-node << EOF
+{{ lookup('template','kubeadm-new-node.j2') }}
+EOF
+kubeadm join --config /tmp/otter/kubeadm-new-node
+
+# 生成bootstrap-kubelet.conf文件
+cat > /etc/kubernetes/bootstrap-kubelet.conf << EOF
+{{ lookup('template','bootstrap-kubelet.conf.j2') }}
+EOF
+
+# 生成lvscare
+cat > /etc/kubernetes/manifests/kube-sealyun-lvscare.yaml <<EOF
+{{ lookup('template','kubeadm-new-node.j2') }}
+EOF
+
+# 将域名调整为vip
+sed -i "s@{{ groups["kubernetes_master"][0] }} apiserver.cluster.local@{{ KUBERNETES_VIP }} apiserver.cluster.local@g"  /etc/hosts
 {% endif %}
 
 {% elif kubernetes_tmp_network_model == "iptables" %}

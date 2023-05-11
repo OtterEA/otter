@@ -72,12 +72,12 @@
 - block: 
   - name: Set Master Node Name
     shell: hostnamectl set-hostname {{ inventory_hostname|replace('.','-') }}.master
-    #hostname: name="{{ inventory_hostname|replace('.','-') }}.master"
+    #hostname: name="{{ inventory_hostname|replace('.','-') }}.master"  some systems does't support this
     when: inventory_hostname in ( groups['kubernetes_master'] + groups['kubernetes_master_control_plane'] )
 
   - name: Set Work Node Name
     shell: hostnamectl set-hostname {{ inventory_hostname|replace('.','-') }}.node
-    #hostname: name="{{ inventory_hostname|replace('.','-') }}.node"
+    #hostname: name="{{ inventory_hostname|replace('.','-') }}.node" some systems does't support this
     when: inventory_hostname in groups['kubernetes_node']
   
 # 设置本地域名解析

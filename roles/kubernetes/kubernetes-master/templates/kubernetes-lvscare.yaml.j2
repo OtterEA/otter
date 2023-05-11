@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: kube-sealyun-lvscare
+    tier: control-plane
+  name: kube-sealyun-lvscare
+  namespace: kube-system
+spec:
+  containers:
+  - args:
+    - care
+    - --vs
+    - {{ KUBERNETES_VIP }}:6443
+    - --health-path
+    - /healthz
+    - --health-schem
+    - https
+{%  for ip in groups["kubernetes_master"] + groups["kubernetes_master_control_plane"] %}
+    - --rs
+    - {{ ip }}:6443
+{% endfor %}
+    command:
+    - /usr/bin/lvscare
+    image: {{ HARBOR_DOMAIN }}/k8s/{{ K8S_IMAGE['k8s-lvscare'] }}
+    imagePullPolicy: IfNotPresent
+    name: kube-sealyun-lvscare
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /lib/modules
+      name: lib-modules
+      readOnly: true
+  hostNetwork: true
+  priorityClassName: system-cluster-critical
+  volumes:
+  - hostPath:
+      path: /lib/modules
+      type: ""
+    name: lib-modules

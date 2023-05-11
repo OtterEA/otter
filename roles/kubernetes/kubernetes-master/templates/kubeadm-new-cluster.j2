@@ -83,10 +83,6 @@ etcd:
       election-timeout: "5000"
 dns:
   type: CoreDNS
-  # 可能版本问题，官网显示支持，实际不支持
-  #ImageMeta:
-  #  imageRepository: 
-  #  imageTag:
 ---
 apiVersion: kubelet.config.k8s.io/v1beta1
 kind: KubeletConfiguration

@@ -1,8 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: JoinConfiguration
-caCertPath: "/etc/kubernetes/pki/ca.crt"
 discovery:
-  bootstrapToken: 
+  bootstrapToken:
 {% if (kubernetes_tmp_network_model == "ipvs") or (kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 1) %}
     apiServerEndpoint: apiserver.cluster.local:6443
 {% elif kubernetes_tmp_network_model == "iptables" and groups["kubernetes_master"]|length + groups["kubernetes_master_control_plane"]|length == 3 %}
@@ -11,3 +10,10 @@ discovery:
     token: {{ KUBERNETES_BOOTSTRAP_TOKEN }}
     caCertHashes:
     - sha256:{{ ca_hex_encoded_hash.stdout }}
+{% if inventory_hostname in groups["kubernetes_master"] + groups["kubernetes_master_control_plane"] %}
+controlPlane:
+  localAPIEndpoint:
+    advertiseAddress: {{ inventory_hostname }} # this may be used 127
+    bindPort: 6443
+  certificateKey: {{ KUBERNETES_CERTIFICATE_KEY }}
+{% endif %}
